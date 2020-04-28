@@ -12,7 +12,7 @@ namespace lesson._01.cs
     {
         public string Run(string[] data)
         {
-            return Happy(int.Parse(data[0])).ToString();
+            return Happy2(int.Parse(data[0])).ToString();
         }
 
         long lPow(long x, long y)
@@ -32,7 +32,26 @@ namespace lesson._01.cs
             return r;
         }
 
-        int Happy(int size)
+        long Happy2(int size)
+        {
+            long[] cs = new long[size * 9 + 1];
+            int[] a = new int[size];
+            while (true)
+            {
+                int sum = Next(a, size);
+                cs[sum]++;
+                if (sum == 0) break;
+            }
+            long c = 0;
+            for(int i = 0; i <= size * 9; i++)
+            {
+                c += cs[i] * cs[i];
+            }
+            Console.WriteLine($"size: {size}; happy: {c}");
+            return c;
+        }
+
+        int Happy1(int size)
         {
             int[] a = new int[size];
             int[] b = new int[size - 1];
