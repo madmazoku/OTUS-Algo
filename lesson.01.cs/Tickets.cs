@@ -12,27 +12,38 @@ namespace lesson._01.cs
     {
         public string Run(string[] data)
         {
-            return Happy2(int.Parse(data[0])).ToString();
+            return Happy(int.Parse(data[0])).ToString();
         }
 
-        long lPow(long x, long y)
+        long Happy(int size)
         {
-            long r = 1;
-            for (int i = 0; i < y; i++)
-                r *= x;
+            long[][] cs = new long[size + 1][];
+            cs[0] = new long[1];
+            cs[0][0] = 1;
 
-            //while (y != 0)
-            //{
-            //    if ((y & 1) == 1)
-            //        r *= x;
-            //    y >>= 1;
-            //    r *= r;
-            //}
+            for (int i = 1; i <= size; i++)
+            {
+                cs[i] = new long[i * 9 + 1];
+                for(int k = 0; k <= 9*(i-1); k++)
+                {
+                    long n = cs[i - 1][k];
+                    for (int c = 0; c <= 9; c++)
+                    {
+                        cs[i][k + c] += n;
+                    }
+                }
+            }
 
-            return r;
+            long fc = 0;
+            for (int i = 0; i <= size * 9; i++)
+            {
+                fc += cs[size][i] * cs[size][i];
+            }
+
+            return fc;
         }
-
-        long Happy2(int size)
+/*
+        long Happy(int size)
         {
             long[] cs = new long[size * 9 + 1];
             int[] a = new int[size];
@@ -42,28 +53,22 @@ namespace lesson._01.cs
                 cs[sum]++;
                 if (sum == 0) break;
             }
+
             long c = 0;
             for(int i = 0; i <= size * 9; i++)
             {
                 c += cs[i] * cs[i];
             }
-            Console.WriteLine($"size: {size}; happy: {c}");
             return c;
         }
-
-        int Happy1(int size)
+*/
+/*
+        int Happy(int size)
         {
             int[] a = new int[size];
             int[] b = new int[size - 1];
             int c = 0;
-            Stopwatch t = new Stopwatch();
-            t.Start();
-            long cycles = 0;
-            long start = t.ElapsedMilliseconds;
-            long prev = start;
-            long cur = start;
-            long full = lPow(10, size*2-1);
-            Console.WriteLine($"size: {size}; full cycles: {full}");
+
             while (true)
             {
                 int sum_a = Next(a, size);
@@ -76,19 +81,11 @@ namespace lesson._01.cs
                     if (sum_b == 0) break;
                 }
                 if (sum_a == 0) break;
-                cur = t.ElapsedMilliseconds;
-                if(cur - prev >= 100)
-                {
-                    Console.WriteLine($"{cur - start}: cycles: {cycles}; happy: {c}; left: {1.0 * (full - cycles) / full * 100}% / {1.0 * (cur-start) / cycles * (full - cycles)}");
-                    prev = cur;
-                }
             }
-            t.Stop();
-            cur = t.ElapsedMilliseconds;
-            Console.WriteLine($"size: {size}; ms: {cur - start}; cycles: {cycles}; happy: {c}");
             return c;
         }
-
+*/
+/*
         int Next(int[] a, int size)
         {
             int sum = 0;
@@ -113,5 +110,6 @@ namespace lesson._01.cs
             }
             return sum;
         }
+*/
     }
 }
