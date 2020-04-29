@@ -59,8 +59,10 @@ namespace lesson._01.cs
 
         static void Main(string[] args)
         {
-            //TestStringLen();
-            //TestTickets();
+            TestStringLen();
+            Console.ReadKey();
+            TestTickets();
+            Console.ReadKey();
             ShowMagic();
         }
     }
