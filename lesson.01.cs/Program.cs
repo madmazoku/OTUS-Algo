@@ -37,6 +37,7 @@ namespace lesson._01.cs
 
         static void TestStringLen()
         {
+            Console.WriteLine("Test Strings");
             ITask task = new StringLen();
             Tester tester = new Tester(task, $"{GetLessonsDataPath(1)}\\0.String");
             tester.RunTest();
@@ -44,14 +45,23 @@ namespace lesson._01.cs
 
         static void TestTickets()
         {
+            Console.WriteLine("Test Tickets");
             ITask task = new Tickets();
             Tester tester = new Tester(task, $"{GetLessonsDataPath(1)}\\1.Tickets");
             tester.RunTest();
         }
 
+        static void ShowMagic()
+        {
+            Magic magic = new Magic();
+            magic.SpellCraft();
+        }
+
         static void Main(string[] args)
         {
-            TestTickets();
+            //TestStringLen();
+            //TestTickets();
+            ShowMagic();
         }
     }
 }
