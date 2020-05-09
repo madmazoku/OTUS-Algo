@@ -101,23 +101,16 @@ namespace lesson._02.cs
             Task<TestResult> asyncTask = Task.Run(
                 () =>
                 {
-                    try
+                    task.Prepare(testCase.Given);
+                    long tries = 0;
+                    Stopwatch sw = Stopwatch.StartNew();
+                    do
                     {
-                        task.Prepare(testCase.Given);
-                        long tries = 0;
-                        Stopwatch sw = Stopwatch.StartNew();
-                        do
-                        {
-                            task.Run();
-                            ++tries;
-                        } while (sw.Elapsed.TotalSeconds < 1.0);
-                        sw.Stop();
-                        return new TestResult(task.Result(testCase.Expect), sw.Elapsed.TotalSeconds / tries);
-                    }
-                    catch (Exception)
-                    {
-                        return new TestResult(false, 0);
-                    }
+                        task.Run();
+                        ++tries;
+                    } while (sw.Elapsed.TotalSeconds < 1.0);
+                    sw.Stop();
+                    return new TestResult(task.Result(testCase.Expect), sw.Elapsed.TotalSeconds / tries);
                 }
             );
 

@@ -156,12 +156,24 @@ namespace lesson._02.cs
             tester.RunTests();
         }
 
+        static void TestPrimes()
+        {
+            Tester tester = new Tester("Тестирование простых чисел", $"{GetLessonsDataPath(2)}\\5.Primes");
+            tester.Add(new PrimesNativeTask());
+            tester.Add(new PrimesListTask());
+            tester.Add(new PrimesEratostheneTask());
+            tester.Add(new PrimesEratostheneBitsTask());
+            tester.Add(new PrimesEratostheneFastTask());
+            tester.RunTests();
+        }
+
         static void Main(string[] args)
         {
-            Console.WindowWidth = 125;
-            Console.BufferWidth = 125;
+            Console.WindowWidth = 152;
+            Console.BufferWidth = 152;
             TestNOD();
             TestPOW();
+            TestPrimes();
         }
     }
 }
