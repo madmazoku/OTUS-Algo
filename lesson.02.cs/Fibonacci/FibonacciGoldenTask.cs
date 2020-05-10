@@ -13,13 +13,15 @@ namespace lesson._02.cs
         decimal pow(decimal x, BigInteger y)
         {
             decimal r = 1;
-            while (y > 0)
+            while (y > 1)
             {
                 if ((y & 0x1) == 1)
                     r *= x;
-                y >>= 1;
                 x *= x;
+                y >>= 1;
             }
+            if (y > 0)
+                r *= x;
             return r;
         }
 
