@@ -11,7 +11,7 @@ namespace lesson._02.cs
 
         public override long Primes(long n)
         {
-            long[] pr = new long[n];
+            long[] pr = new long[n + 1];
             long pri = 0;
             long[] lp = new long[n + 1];
 
