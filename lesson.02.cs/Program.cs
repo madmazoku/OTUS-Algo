@@ -167,6 +167,17 @@ namespace lesson._02.cs
             tester.RunTests();
         }
 
+        static void TestFibonacci()
+        {
+            Tester tester = new Tester("Тестирование чисел Фибоначчи", $"{GetLessonsDataPath(2)}\\4.Fibo");
+            tester.Add(new FibonacciRecursiveTask());
+            tester.Add(new FibonacciIterativeTask());
+            tester.Add(new FibonacciGoldenTask());
+            tester.Add(new FibonacciMatrixTask());
+            tester.Add(new FibonacciMatrixParallelTask());
+            tester.RunTests();
+        }
+
         static void Main(string[] args)
         {
             Console.WindowWidth = 152;
@@ -174,6 +185,7 @@ namespace lesson._02.cs
             TestNOD();
             TestPOW();
             TestPrimes();
+            TestFibonacci();
         }
     }
 }

@@ -9,13 +9,15 @@ namespace lesson._02.cs
         public override double POW(double x, long y)
         {
             double r = 1;
-            while(y > 0)
+            while(y > 1)
             {
                 if ((y & 0x1) == 1)
                     r *= x;
-                y >>= 1;
                 x *= x;
+                y >>= 1;
             }
+            if (y > 0)
+                r *= x;
             return r;
         }
     }

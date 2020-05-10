@@ -4,7 +4,7 @@ namespace lesson._02.cs
 {
     class GCDDeductionTask : GCDTask
     {
-        public override string Name() { return "Через вычитание"; }
+        public override string Name() { return "Вычитание"; }
 
         public override BigInteger GCD(BigInteger a, BigInteger b)
         {

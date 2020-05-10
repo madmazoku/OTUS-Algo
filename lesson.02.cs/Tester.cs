@@ -35,15 +35,18 @@ namespace lesson._02.cs
         {
             bool success;
             double duration;
+            bool exception;
 
-            public TestResult(bool success, double duration)
+            public TestResult(bool success, double duration, bool exception)
             {
                 this.success = success;
                 this.duration = duration;
+                this.exception = exception;
             }
 
             public bool Success { get { return success; } }
             public double Duration { get { return duration; } }
+            public bool Exception { get { return exception; } }
         }
 
         public Tester(string group, string path)
@@ -71,7 +74,12 @@ namespace lesson._02.cs
                 foreach (ITask task in tasks)
                 {
                     TestResult testResult = RunTest(task, testCase);
-                    Console.Write($"| {testResult.Success,5} - {testResult.Duration,17:g8} ");
+                    Console.Write("|");
+                    if (testResult.Exception)
+                        Console.BackgroundColor = ConsoleColor.Red;
+                    Console.Write($" {testResult.Success,5} - {testResult.Duration,17:g8} ");
+                    if (testResult.Exception)
+                        Console.BackgroundColor = ConsoleColor.Black;
                 }
                 Console.WriteLine("|");
             }
@@ -101,16 +109,22 @@ namespace lesson._02.cs
             Task<TestResult> asyncTask = Task.Run(
                 () =>
                 {
-                    task.Prepare(testCase.Given);
-                    long tries = 0;
-                    Stopwatch sw = Stopwatch.StartNew();
-                    do
+                    try
                     {
-                        task.Run();
-                        ++tries;
-                    } while (sw.Elapsed.TotalSeconds < 1.0);
-                    sw.Stop();
-                    return new TestResult(task.Result(testCase.Expect), sw.Elapsed.TotalSeconds / tries);
+                        task.Prepare(testCase.Given);
+                        long tries = 0;
+                        Stopwatch sw = Stopwatch.StartNew();
+                        do
+                        {
+                            task.Run();
+                            ++tries;
+                        } while (sw.Elapsed.TotalSeconds < 1.0);
+                        sw.Stop();
+                        return new TestResult(task.Result(testCase.Expect), sw.Elapsed.TotalSeconds / tries, false);
+                    } catch(Exception)
+                    {
+                        return new TestResult(false, 0, true);
+                    }
                 }
             );
 
@@ -120,7 +134,7 @@ namespace lesson._02.cs
             if (asyncTask.Wait(TimeSpan.FromSeconds(10)))
                 return asyncTask.Result;
             else
-                return new TestResult(false, 0);
+                return new TestResult(false, 0, true);
         }
     }
 }
