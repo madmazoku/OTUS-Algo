@@ -10,6 +10,8 @@ namespace lesson._02.cs
         private long y;
         private double pow;
 
+        private static double epsilon = 1e-8;
+
         public abstract string Name();
 
         public void Prepare(string[] data)
@@ -27,7 +29,7 @@ namespace lesson._02.cs
         public bool Result(string expected)
         {
             double expectedPOW = double.Parse(expected);
-            return Math.Abs(pow - expectedPOW) <= 1e-6 * 0.5 * expectedPOW;
+            return Math.Abs(pow - expectedPOW) <= epsilon * expectedPOW;
         }
 
         public abstract double POW(double x, long y);
