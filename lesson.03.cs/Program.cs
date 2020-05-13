@@ -25,11 +25,19 @@ namespace lesson._03.cs
             tester.RunTests(task);
         }
 
+        static void TestRBQ()
+        {
+            Tester tester = new Tester(3, "4.Bitboard - Дальнобойщики");
+            RBQTask task = new RBQTask();
+            tester.RunTests(task);
+        }
+
         static void Main(string[] args)
         {
             TestKing();
             TestKnight();
             TestFEN();
+            TestRBQ();
         }
     }
 }
