@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace lesson._02.cs
 {
@@ -21,12 +20,12 @@ namespace lesson._02.cs
                     return GCD(a >> 1, b);
             else
                 if ((b & 0x1) == 0)
-                    return GCD(a, b >> 1);
-                else
+                return GCD(a, b >> 1);
+            else
                     if (a > b)
-                        return GCD((a - b) >> 1, b);
-                    else
-                        return GCD(a, (b - a) >> 1);
+                return GCD((a - b) >> 1, b);
+            else
+                return GCD(a, (b - a) >> 1);
         }
 
     }

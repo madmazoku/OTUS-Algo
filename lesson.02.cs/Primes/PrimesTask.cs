@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace lesson._02.cs
+﻿namespace lesson._02.cs
 {
     abstract class PrimesTask : ITask
     {

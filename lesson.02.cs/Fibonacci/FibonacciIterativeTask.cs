@@ -13,7 +13,7 @@ namespace lesson._02.cs
 
             BigInteger p = 0;
             BigInteger f = 1;
-            while(n >= 2)
+            while (n >= 2)
             {
                 BigInteger t = f;
                 f += p;

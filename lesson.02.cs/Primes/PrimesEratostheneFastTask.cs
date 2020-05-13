@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-
-namespace lesson._02.cs
+﻿namespace lesson._02.cs
 {
     class PrimesEratostheneFastTask : PrimesTask
     {

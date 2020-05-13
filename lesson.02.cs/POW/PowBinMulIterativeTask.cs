@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace lesson._02.cs
+﻿namespace lesson._02.cs
 {
     class POWBinMulIterateTask : POWTask
     {
@@ -17,12 +15,12 @@ namespace lesson._02.cs
                 ++n;
                 y >>= 1;
             }
-            while(y > 1)
+            while (y > 1)
             {
                 r *= x;
                 --y;
             }
-            while(n > 0)
+            while (n > 0)
             {
                 r *= r;
                 --n;

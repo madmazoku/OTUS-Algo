@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace lesson._03.cs
+﻿namespace lesson._03.cs
 {
     class Utils
     {

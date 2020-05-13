@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace lesson._01.cs
+﻿namespace lesson._01.cs
 {
     class StringLen : ITask
     {

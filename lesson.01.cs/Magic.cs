@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 
 namespace lesson._01.cs
 {
@@ -47,9 +43,9 @@ namespace lesson._01.cs
         {
             Console.Title = name;
             Console.SetCursorPosition(0, 0);
-            for(int y = 0; y < 25; y++)
+            for (int y = 0; y < 25; y++)
             {
-                for(int x = 0; x < 25; x++)
+                for (int x = 0; x < 25; x++)
                 {
                     Console.Write(spell(x, y) ? "# " : ". ");
                 }

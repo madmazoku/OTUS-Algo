@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Numerics;
-using System.Text;
+﻿using System.Numerics;
 using System.Threading.Tasks;
 
 namespace lesson._02.cs
@@ -110,9 +106,9 @@ namespace lesson._02.cs
             if (n < 2)
                 return n;
 
-            BigInteger[,] f = PowMatrix(FibonacciMatrix(), n-1);
+            BigInteger[,] f = PowMatrix(FibonacciMatrix(), n - 1);
 
-            return f[0,0];
+            return f[0, 0];
         }
     }
 }

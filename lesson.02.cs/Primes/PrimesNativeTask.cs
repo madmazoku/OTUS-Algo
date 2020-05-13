@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace lesson._02.cs
 {
@@ -25,7 +23,7 @@ namespace lesson._02.cs
         {
             long cnt = 0;
             for (long i = 2; i <= n; ++i)
-               if (isPrime(i))
+                if (isPrime(i))
                     ++cnt;
             return cnt;
         }

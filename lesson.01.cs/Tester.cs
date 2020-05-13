@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Threading.Tasks.Sources;
 
 namespace lesson._01.cs
 {
@@ -20,7 +17,7 @@ namespace lesson._01.cs
         public void RunTest()
         {
             int nr = 0;
-            while(true)
+            while (true)
             {
                 string inFile = $"{path}\\test.{nr}.in";
                 string outFile = $"{path}\\test.{nr}.out";
@@ -40,7 +37,7 @@ namespace lesson._01.cs
                 string actual = task.Run(data);
                 return actual == expect;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 return false;

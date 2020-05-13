@@ -121,7 +121,8 @@ namespace lesson._02.cs
                         } while (sw.Elapsed.TotalSeconds < 1.0);
                         sw.Stop();
                         return new TestResult(task.Result(testCase.Expect), sw.Elapsed.TotalSeconds / tries, false);
-                    } catch(Exception)
+                    }
+                    catch (Exception)
                     {
                         return new TestResult(false, 0, true);
                     }

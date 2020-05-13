@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace lesson._02.cs
+﻿namespace lesson._02.cs
 {
     class POWBinIterativeTask : POWTask
     {
@@ -9,7 +7,7 @@ namespace lesson._02.cs
         public override double POW(double x, long y)
         {
             double r = 1;
-            while(y > 1)
+            while (y > 1)
             {
                 if ((y & 0x1) == 1)
                     r *= x;

@@ -23,8 +23,8 @@ namespace lesson._01.cs
         static string GetLessonsDataPath(int lesson)
         {
             string lessonDir = $"//lesson.{lesson:d2}.data";
-            DirectoryInfo path= new DirectoryInfo(Directory.GetCurrentDirectory());
-            while(path != null)
+            DirectoryInfo path = new DirectoryInfo(Directory.GetCurrentDirectory());
+            while (path != null)
             {
                 if (Directory.Exists(path.ToString() + lessonDir))
                 {

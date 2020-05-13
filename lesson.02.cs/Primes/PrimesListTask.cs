@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace lesson._02.cs
 {
@@ -14,7 +13,7 @@ namespace lesson._02.cs
                 return n == 2;
 
             long s = (long)Math.Sqrt(n);
-            foreach(long i in primes)
+            foreach (long i in primes)
                 if (i > s)
                     break;
                 else if (n % i == 0)

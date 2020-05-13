@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 
 namespace lesson._02.cs
 {
@@ -14,7 +12,7 @@ namespace lesson._02.cs
             BitArray not_primes = new BitArray((int)n);
             long s = (long)Math.Sqrt(n);
             long primes = 0;
-            for(long i = 2; i <= s; ++i)
+            for (long i = 2; i <= s; ++i)
             {
                 if (not_primes.Get((int)(i - 1))) continue;
                 ++primes;

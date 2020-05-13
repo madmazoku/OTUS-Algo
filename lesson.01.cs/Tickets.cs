@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Text;
-using System.Timers;
-
-namespace lesson._01.cs
+﻿namespace lesson._01.cs
 {
     class Tickets : ITask
     {
@@ -24,7 +16,7 @@ namespace lesson._01.cs
             for (int i = 1; i <= size; i++)
             {
                 cs[i] = new long[i * 9 + 1];
-                for(int k = 0; k <= 9*(i-1); k++)
+                for (int k = 0; k <= 9 * (i - 1); k++)
                 {
                     long n = cs[i - 1][k];
                     for (int c = 0; c <= 9; c++)

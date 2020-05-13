@@ -1,5 +1,4 @@
 ﻿using lesson._02.cs;
-using System;
 
 namespace lesson._03.cs
 {

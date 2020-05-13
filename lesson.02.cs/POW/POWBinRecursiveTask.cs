@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace lesson._02.cs
+﻿namespace lesson._02.cs
 {
     class POWBinRecursiveTask : POWTask
     {
