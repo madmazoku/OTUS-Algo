@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
 
 namespace lesson._04.cs
 {
@@ -36,10 +33,11 @@ namespace lesson._04.cs
                 if (index < size)
                     Array.Copy(data, index, newData, index + 1, size - index);
                 data = newData;
-            } else
+            }
+            else
             {
-                if(index < size)
-                   Utils.MoveForward<T>(data, index, size - index);
+                if (index < size)
+                    Utils.MoveForward<T>(data, index, size - index);
             }
             data[index] = item;
             ++size;

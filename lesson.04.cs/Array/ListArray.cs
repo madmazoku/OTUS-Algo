@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace lesson._04.cs
+﻿namespace lesson._04.cs
 {
     class ListArray<T> : IArray<T>
     {
@@ -23,7 +19,7 @@ namespace lesson._04.cs
         public void Add(T item)
         {
             Node<T> newNode = new Node<T>(item, null);
-            if(size == 0)
+            if (size == 0)
                 head = tail = newNode;
             else
             {
@@ -42,7 +38,7 @@ namespace lesson._04.cs
                 Node<T> current;
                 Node<T> prev;
                 (current, prev) = FindNode(index);
-                if(prev == null)
+                if (prev == null)
                     head = new Node<T>(item, head);
                 else
                     prev.Next = new Node<T>(item, prev.Next);
@@ -70,14 +66,14 @@ namespace lesson._04.cs
             Node<T> prev;
             (current, prev) = FindNode(index);
 
-            if(prev == null)
+            if (prev == null)
                 head = current.Next;
             else
                 prev.Next = current.Next;
 
-            if(current.Next == null)
+            if (current.Next == null)
                 tail = prev;
-            
+
             --size;
 
             return current.Item;
@@ -87,7 +83,7 @@ namespace lesson._04.cs
         {
             Node<T> current = head;
             Node<T> prev = null;
-            while(index > 0 && current != null)
+            while (index > 0 && current != null)
             {
                 prev = current;
                 current = current.Next;

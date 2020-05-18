@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
-
-namespace lesson._04.cs
+﻿namespace lesson._04.cs
 {
     class Node<T>
     {
@@ -17,6 +12,6 @@ namespace lesson._04.cs
         }
 
         public T Item { get { return item; } set { item = value; } }
-        public Node<T> Next { get { return next; } set { next = value; }  }
+        public Node<T> Next { get { return next; } set { next = value; } }
     }
 }

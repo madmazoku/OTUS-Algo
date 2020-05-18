@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-
-namespace lesson._04.cs
+﻿namespace lesson._04.cs
 {
     class MatrixArray<T> : IArray<T>
     {
@@ -43,7 +38,7 @@ namespace lesson._04.cs
 
                 int currentSlice = lastSlice;
                 T[] currentArray = array.Get(array.Size() - 1);
-                if(currentSlice > slice)
+                if (currentSlice > slice)
                 {
                     if (lastSize > 0)
                         Utils.MoveForward<T>(currentArray, 0, lastSize);
@@ -51,7 +46,7 @@ namespace lesson._04.cs
                     currentArray[0] = prevArray[vector - 1];
                     currentArray = prevArray;
                     --currentSlice;
-                    while(currentSlice > slice)
+                    while (currentSlice > slice)
                     {
                         Utils.MoveForward<T>(currentArray, 0, vector - 1);
                         prevArray = array.Get(currentSlice - 1);
@@ -61,9 +56,10 @@ namespace lesson._04.cs
                     }
                     if (pos < vector)
                         Utils.MoveForward<T>(currentArray, pos, vector - pos - 1);
-                } else
+                }
+                else
                 {
-                    if(pos < lastSize)
+                    if (pos < lastSize)
                         Utils.MoveForward<T>(currentArray, pos, lastSize - pos);
                 }
             }
@@ -79,7 +75,7 @@ namespace lesson._04.cs
 
         public void Set(T item, int index)
         {
-            array.Get(index / vector)[index% vector] = item;
+            array.Get(index / vector)[index % vector] = item;
         }
 
         public T Remove(int index)
@@ -96,7 +92,7 @@ namespace lesson._04.cs
 
                 int currentSlice = slice;
                 T[] currentArray = array.Get(currentSlice);
-                if(currentSlice < lastSlice)
+                if (currentSlice < lastSlice)
                 {
                     if (pos < vector - 1)
                         Utils.MoveBackward<T>(currentArray, pos, vector - pos);
@@ -104,7 +100,7 @@ namespace lesson._04.cs
                     currentArray[vector - 1] = nextArray[0];
                     currentArray = nextArray;
                     ++currentSlice;
-                    while(currentSlice < lastSlice - 1)
+                    while (currentSlice < lastSlice - 1)
                     {
                         Utils.MoveBackward<T>(currentArray, 0, vector);
                         nextArray = array.Get(currentSlice + 1);
@@ -112,14 +108,14 @@ namespace lesson._04.cs
                         currentArray = nextArray;
                         ++currentSlice;
                     }
-                    if(lastSize > 0)
+                    if (lastSize > 0)
                         Utils.MoveBackward<T>(currentArray, 0, lastSize);
                     else
                         Utils.MoveBackward<T>(currentArray, 0, vector);
                 }
                 else
                 {
-                    if(pos < lastSize)
+                    if (pos < lastSize)
                         Utils.MoveBackward<T>(currentArray, pos, lastSize - pos);
                 }
             }

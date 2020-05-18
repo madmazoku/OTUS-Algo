@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace lesson._04.cs
 {
@@ -17,12 +15,12 @@ namespace lesson._04.cs
             this.name = name;
         }
 
-        public string Name() { return name;  }
+        public string Name() { return name; }
 
         public void Prepare(string[] data)
         {
             commands.Clear();
-            foreach(string line in data)
+            foreach (string line in data)
                 commands.Add(line.Split(' '));
         }
         public bool Result(string[] expect)
@@ -41,11 +39,11 @@ namespace lesson._04.cs
         {
             responses.Clear();
             T array = new T();
-           
-            foreach(string[] command in commands)
+
+            foreach (string[] command in commands)
             {
                 string response;
-                switch(command[0].ToUpper())
+                switch (command[0].ToUpper())
                 {
                     case "ADD":
                         {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace lesson._04.cs
+﻿namespace lesson._04.cs
 {
     interface IArray<T>
     {
