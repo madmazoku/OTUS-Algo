@@ -65,6 +65,33 @@ namespace lesson._04.cs
             return item;
         }
 
+        public T dequeNext(Node<T> node)
+        {
+            if (IsEmpty)
+                throw new Exception("empty collection");
+
+            --size;
+
+            T item;
+            if (node == null)
+            {
+                item = head.Item;
+                head = head.Next;
+                if (IsEmpty)
+                    tail = null;
+            }
+            else
+            {
+                if (node.Next == null)
+                    throw new IndexOutOfRangeException();
+
+                item = node.Next.Item;
+                node.Next = node.Next.Next;
+            }
+
+            return item;
+        }
+
         public T[] Array
         {
             get

@@ -19,7 +19,7 @@ namespace lesson._04.cs
         {
             Console.WriteLine("Тестирование приоритетной очереди");
             {
-                Console.WriteLine("Добавление значений с одинаковым приоритетом");
+                Console.WriteLine("\tДобавление значений с одинаковым приоритетом");
                 int[] expectArray = { 1, 2, 3 };
 
                 PriorityQueue<int, int> priorityQueue = new PriorityQueue<int, int>();
@@ -30,13 +30,13 @@ namespace lesson._04.cs
                 for (int index = 0; index < expectArray.Length; ++index)
                     if (expectArray[index] != array[index])
                     {
-                        Console.WriteLine($"\tTest failed at index {index}");
+                        Console.WriteLine($"\t\tTest failed at index {index}");
                         return;
                     }
-                Console.WriteLine("\tTest succeeded");
+                Console.WriteLine("\t\tTest succeeded");
             }
             {
-                Console.WriteLine("Добавление значений с разным приоритетом");
+                Console.WriteLine("\tДобавление значений с разным приоритетом");
                 int[] expectArray = { 2, 1, 5, 4, 3 };
 
                 PriorityQueue<int, int> priorityQueue = new PriorityQueue<int, int>();
@@ -49,13 +49,13 @@ namespace lesson._04.cs
                 for (int index = 0; index < expectArray.Length; ++index)
                     if (expectArray[index] != array[index])
                     {
-                        Console.WriteLine($"\tTest failed at index {index}");
+                        Console.WriteLine($"\t\tTest failed at index {index}");
                         return;
                     }
-                Console.WriteLine("\tTest succeeded");
+                Console.WriteLine("\t\tTest succeeded");
             }
             {
-                Console.WriteLine("Извлечение значений");
+                Console.WriteLine("\tУдаление значений");
                 int[] expectArray = { 2, 1, 5, 4, 3 };
 
                 PriorityQueue<int, int> priorityQueue = new PriorityQueue<int, int>();
@@ -65,22 +65,91 @@ namespace lesson._04.cs
                 priorityQueue.enque(2, 4);
                 priorityQueue.enque(3, 5);
                 for (int index = 0; index < expectArray.Length; ++index)
-                {
                     if (expectArray[index] != priorityQueue.deque())
                     {
-                        Console.WriteLine($"\tTest failed at deque {index}");
+                        Console.WriteLine($"\t\tTest failed at deque {index}");
                         return;
                     }
-                }
-                Console.WriteLine("\tTest succeeded");
+                Console.WriteLine("\t\tTest succeeded");
             }
+            Console.WriteLine("");
+        }
+        static void TestSparseArray()
+        {
+            Console.WriteLine("Тестирование разряжённого массива");
+            {
+                Console.WriteLine("\tДобавление значений");
+
+                SparseArray<int> sparseArray = new SparseArray<int>();
+                int[] expectArray = { 0, 1, 0, 2, 3, 0, 4 };
+
+                sparseArray.Add(1, 1);
+                sparseArray.Add(4, 4);
+                sparseArray.Add(3, 3);
+                sparseArray.Add(2, 3);
+
+                for (int index = 0; index < expectArray.Length; ++index)
+                    if (expectArray[index] != sparseArray.Get(index))
+                    {
+                        Console.WriteLine($"\t\tTest failed at index {index}");
+                        return;
+                    }
+                Console.WriteLine("\t\tTest succeeded");
+            }
+            {
+                Console.WriteLine("\tУстановка значений");
+
+                SparseArray<int> sparseArray = new SparseArray<int>();
+                int[] expectArray = { 0, 1, 0, 2, 3, 0, 4 };
+
+                sparseArray.Set(1, 1);
+                sparseArray.Set(4, 6);
+                sparseArray.Set(5, 4);
+                sparseArray.Set(2, 3);
+                sparseArray.Set(3, 4);
+
+                for (int index = 0; index < expectArray.Length; ++index)
+                    if (expectArray[index] != sparseArray.Get(index))
+                    {
+                        Console.WriteLine($"\t\tTest failed at index {index}");
+                        return;
+                    }
+                Console.WriteLine("\t\tTest succeeded");
+            }
+            {
+                Console.WriteLine("\tУдаление значений");
+
+                SparseArray<int> sparseArray = new SparseArray<int>();
+                int[] expectRemoveArray = { 2, 3, 0 };
+                int[] expectArray = { 0, 1, 0, 4 };
+
+                sparseArray.Set(1, 1);
+                sparseArray.Set(4, 6);
+                sparseArray.Set(3, 4);
+                sparseArray.Set(2, 3);
+                for (int index = 0; index < expectRemoveArray.Length; ++index)
+                    if (expectRemoveArray[index] != sparseArray.Remove(3))
+                    {
+                        Console.WriteLine($"\t\tTest failed at remove 3 try {index}");
+                        return;
+                    }
+                for (int index = 0; index < expectArray.Length; ++index)
+                    if (expectArray[index] != sparseArray.Get(index))
+                    {
+                        Console.WriteLine($"\t\tTest failed at index {index}");
+                        return;
+                    }
+                Console.WriteLine("\t\tTest succeeded");
+            }
+            Console.WriteLine("");
         }
         static void Main(string[] args)
         {
             Console.WindowWidth = 152;
             Console.BufferWidth = 152;
-            //TestArrays();
+            TestArrays();
             TestPriorityQueue();
+            TestSparseArray();
         }
 
     }
