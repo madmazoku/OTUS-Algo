@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Data.Common;
 using System.Diagnostics;
 
 namespace lesson._05.cs
@@ -38,7 +40,7 @@ namespace lesson._05.cs
 
         static (bool, double) BenchmarkSort(string name, int[] array, Func<int[], int[]> sortFunc)
         {
-            //Console.WriteLine($"\t{name} Sort check");
+            Console.WriteLine($"\t{name} Sort check");
             double sec = 0;
             int[] testArray = new int[array.Length];
             int cnt = 0;
@@ -53,7 +55,7 @@ namespace lesson._05.cs
             }
             double avgSec = sec / cnt;
             bool success = CheckSort(testArray);
-            //Console.WriteLine($"\t\tSorting: {success}; Average time: {avgSec} sec");
+            Console.WriteLine($"\t\tSorting: {success}; Average time: {avgSec} sec");
             if (!success) throw new Exception("Not sorting properly");
             return (success, avgSec);
         }
@@ -142,17 +144,81 @@ namespace lesson._05.cs
             return array;
         }
 
+        static void Heapify(int[] array, int index, int max)
+        {
+            int maxIndex = index;
+            int leftIndex = (index << 1) + 1;
+
+            if (leftIndex < max)
+            {
+                Heapify(array, leftIndex, max);
+                if (array[leftIndex] > array[maxIndex])
+                    maxIndex = leftIndex;
+
+                int rightIndex = leftIndex + 1;
+                if (rightIndex < max)
+                {
+                    Heapify(array, rightIndex, max);
+                    if (array[rightIndex] > array[maxIndex])
+                        maxIndex = rightIndex;
+                }
+
+                if (index != maxIndex)
+                {
+                    Swap(ref array[index], ref array[maxIndex]);
+                    Heapify(array, maxIndex, max);
+                }
+            }
+        }
+
+        static int[] FullHeapSort(int[] array)
+        {
+            for(int max = array.Length; max > 1; --max)
+            {
+                Heapify(array, 0, max);
+                Swap(ref array[0], ref array[max - 1]);
+            }
+            return array;
+        }
+
+        static int[] PartialHeapSort(int[] array)
+        {
+            for (int max = array.Length; max > 0; --max)
+            {
+                for (int index = max / 2; index > 0; --index)
+                {
+                    int realIndex = index - 1;
+                    int maxIndex = realIndex;
+                    int leftIndex = (realIndex << 1) + 1;
+                    if(leftIndex < max)
+                    {
+                        if (array[maxIndex] < array[leftIndex])
+                            maxIndex = leftIndex;
+                        
+                        if(leftIndex < max - 1 && array[maxIndex] < array[leftIndex + 1])
+                            maxIndex = leftIndex + 1;
+                    }
+                    if (maxIndex != realIndex)
+                        Swap(ref array[realIndex], ref array[maxIndex]);
+                }
+                Swap(ref array[0], ref array[max - 1]);
+            }
+            return array;
+        }
+
         static void Main(string[] args)
         {
             double bubbleAvgSec = 0;
             double selectionAvgSec = 0;
             double insertionAvgSec = 0;
             double shellAvgSec = 0;
+            double fullHeapAvgSec = 0;
+            double partialHeapAvgSec = 0;
             int allAttempts = 10;
             for (int attempt = 0; attempt < allAttempts; ++attempt)
             {
-                Console.WriteLine($"Try attempt: {attempt}");
-                int[] array = RandomizeArray(100000);
+                int[] array = RandomizeArray(10000);
+                Console.WriteLine($"Try attempt: {attempt}; sort {array.Length}");
                 {
                     (bool success, double avgSec) = BenchmarkSort("Bubble", array, BubbleSort);
                     bubbleAvgSec += avgSec;
@@ -169,17 +235,29 @@ namespace lesson._05.cs
                     (bool success, double avgSec) = BenchmarkSort("Shell", array, ShellSort);
                     shellAvgSec += avgSec;
                 }
+                {
+                    (bool success, double avgSec) = BenchmarkSort("Partial Heap", array, FullHeapSort);
+                    fullHeapAvgSec += avgSec;
+                }
+                {
+                    (bool success, double avgSec) = BenchmarkSort("Partial Heap", array, PartialHeapSort);
+                    partialHeapAvgSec += avgSec;
+                }
             }
             bubbleAvgSec /= allAttempts;
             selectionAvgSec /= allAttempts;
             insertionAvgSec /= allAttempts;
             shellAvgSec /= allAttempts;
+            fullHeapAvgSec /= allAttempts;
+            partialHeapAvgSec /= allAttempts;
             Console.WriteLine("");
 
-            Console.WriteLine($"Bubble    sorting average time: {bubbleAvgSec} sec");
-            Console.WriteLine($"Selection sorting average time: {selectionAvgSec} sec");
-            Console.WriteLine($"Insertion sorting average time: {insertionAvgSec} sec");
-            Console.WriteLine($"Shell sorting average time: {shellAvgSec} sec");
+            Console.WriteLine($"Bubble       sorting average time: {bubbleAvgSec} sec");
+            Console.WriteLine($"Selection    sorting average time: {selectionAvgSec} sec");
+            Console.WriteLine($"Insertion    sorting average time: {insertionAvgSec} sec");
+            Console.WriteLine($"Shell        sorting average time: {shellAvgSec} sec");
+            Console.WriteLine($"Full Heap    sorting average time: {fullHeapAvgSec} sec");
+            Console.WriteLine($"Partial Heap sorting average time: {partialHeapAvgSec} sec");
         }
     }
 }
