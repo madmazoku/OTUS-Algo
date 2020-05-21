@@ -43,7 +43,7 @@ namespace lesson._05.cs
             double sec = 0;
             int[] testArray = new int[array.Length];
             int cnt = 0;
-            while (sec < 1)
+
             {
                 ++cnt;
                 Array.Copy(array, testArray, array.Length);
@@ -52,8 +52,21 @@ namespace lesson._05.cs
                 sw.Stop();
                 sec += sw.Elapsed.TotalSeconds;
             }
-            double avgSec = sec / cnt;
             bool success = CheckSort(testArray);
+
+            Random rnd = new Random();
+            while (success && sec < 1)
+            {
+                ++cnt;
+                for (int index = 0; index < testArray.Length; ++index)
+                    array[index] = (int)(rnd.NextDouble() * testArray.Length);
+                Stopwatch sw = Stopwatch.StartNew();
+                sortFunc(testArray);
+                sw.Stop();
+                sec += sw.Elapsed.TotalSeconds;
+                success = success && CheckSort(testArray);
+            }
+            double avgSec = sec / cnt;
             return (success, avgSec);
         }
 
@@ -100,11 +113,16 @@ namespace lesson._05.cs
         {
             for (int first = 1; first < array.Length; ++first)
             {
-                for (int index = first; index > 0; --index)
-                    if (array[index - 1] > array[index])
-                        Swap(ref array[index - 1], ref array[index]);
-                    else
+                int index = first;
+                int indexPrev = index - 1;
+                while (array[indexPrev] > array[index])
+                {
+                    Swap(ref array[indexPrev], ref array[index]);
+                    if (indexPrev == 0)
                         break;
+                    index = indexPrev;
+                    --indexPrev;
+                }
             }
             return array;
         }
@@ -114,30 +132,80 @@ namespace lesson._05.cs
             int items = array.Length / gap;
             for (int first = 1; first < items; ++first)
             {
-                for (int index = first; index > 0; --index)
+                int realIndex = first * gap + offset;
+                int realIndexPrev = realIndex - gap;
+                while (array[realIndexPrev] > array[realIndex])
                 {
-                    int realIndex = index * gap + offset;
-                    int realIndexPrev = realIndex - gap;
-                    if (array[realIndexPrev] > array[realIndex])
-                        Swap(ref array[realIndexPrev], ref array[realIndex]);
-                    else
+                    Swap(ref array[realIndexPrev], ref array[realIndex]);
+                    if (realIndexPrev <= offset)
                         break;
+                    realIndex = realIndexPrev;
+                    realIndexPrev -= gap;
                 }
             }
             return array;
         }
 
-        static double phi = (Math.Sqrt(5) + 1) / 2;
-        static int[] ShellSort(int[] array)
+        static int[] KnutShellSort(int[] array)
+        {
+            int length3 = array.Length / 3;
+            int gap = 1;
+            while (gap < length3)
+                gap = 3 * gap + 1;
+
+            while (true)
+            {
+                for (int first = gap; first < array.Length; ++first)
+                {
+                    int index = first;
+                    int indexPrev = index - gap;
+                    while (array[indexPrev] > array[index])
+                    {
+                        Swap(ref array[indexPrev], ref array[index]);
+                        if (indexPrev < gap)
+                            break;
+                        index = indexPrev;
+                        indexPrev -= gap;
+                    }
+                }
+
+                if (gap >= 3)
+                    gap -= gap / 3;
+                else if (gap > 1)
+                    gap = 1;
+                else
+                    break;
+            }
+            return array;
+        }
+
+        static int[] BinaryShellSort(int[] array)
         {
             int gap = array.Length >> 1;
-            while (gap > 1)
+
+            while (true)
             {
-                for (int offset = 0; offset < gap; ++offset)
-                    InsertionSort(array, gap, offset);
-                gap >>= 1;
+                for (int first = gap; first < array.Length; ++first)
+                {
+                    int index = first;
+                    int indexPrev = index - gap;
+                    while (array[indexPrev] > array[index])
+                    {
+                        Swap(ref array[indexPrev], ref array[index]);
+                        if (indexPrev < gap)
+                            break;
+                        index = indexPrev;
+                        indexPrev -= gap;
+                    }
+                }
+
+                if (gap > 2)
+                    gap >>= 1;
+                else if (gap > 1)
+                    gap = 1;
+                else
+                    break;
             }
-            InsertionSort(array);
             return array;
         }
 
@@ -248,7 +316,7 @@ namespace lesson._05.cs
             {
                 this.name = name;
                 this.sortFunc = sortFunc;
-                this.result = null;
+                result = null;
             }
         }
 
@@ -269,25 +337,25 @@ namespace lesson._05.cs
 
         static void Main(string[] args)
         {
-            int[] arr = RandomizeArray(10);
-            SinkHeapSort(arr);
-
             List<SortTestCase> testCases = new List<SortTestCase>();
             testCases.Add(new SortTestCase("Bubble", BubbleSort));
             testCases.Add(new SortTestCase("Selection", SelectionSort));
             testCases.Add(new SortTestCase("Insertion", InsertionSort));
-            testCases.Add(new SortTestCase("Shell", ShellSort));
+            testCases.Add(new SortTestCase("Knut Shell", KnutShellSort));
+            testCases.Add(new SortTestCase("Binary Shell", BinaryShellSort));
             testCases.Add(new SortTestCase("Full Heap", FullHeapSort));
             testCases.Add(new SortTestCase("Sink Heap", SinkHeapSort));
             testCases.Add(new SortTestCase("Partial Heap", PartialHeapSort));
+
+            Console.BufferWidth = 15 * (testCases.Count + 1) + 1;
+            Console.WindowWidth = Console.BufferWidth;
 
             Console.Write($"{"Array",12} |");
             foreach (SortTestCase testCase in testCases)
                 Console.Write($" {testCase.name,12} |");
             Console.WriteLine("");
 
-            int allAttempts = 10;
-            for (int attempt = 0; attempt < allAttempts; ++attempt)
+            for (int attempt = 0; attempt < 9; ++attempt)
             {
                 int[] array = RandomizeArray(POW(10, attempt + 1));
                 Console.Write($"{array.Length,12} |");
@@ -295,7 +363,7 @@ namespace lesson._05.cs
                     testCase.result = Task.Run(() =>
                     {
                         Task<(bool, double)> result = Task.Run(() => { return BenchmarkSort(testCase.name, testCase.sortFunc, array); });
-                        if (result.Wait(TimeSpan.FromSeconds(60)))
+                        if (result.Wait(TimeSpan.FromSeconds(600)))
                             return result.Result;
                         else
                             return (false, 0);
