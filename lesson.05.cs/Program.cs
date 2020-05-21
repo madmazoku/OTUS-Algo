@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace lesson._05.cs
 {
@@ -241,11 +242,13 @@ namespace lesson._05.cs
         {
             public string name;
             public Func<int[], int[]> sortFunc;
+            public Task<(bool, double)> result;
 
             public SortTestCase(string name, Func<int[], int[]> sortFunc)
             {
                 this.name = name;
                 this.sortFunc = sortFunc;
+                this.result = null;
             }
         }
 
@@ -289,8 +292,18 @@ namespace lesson._05.cs
                 int[] array = RandomizeArray(POW(10, attempt + 1));
                 Console.Write($"{array.Length,12} |");
                 foreach (SortTestCase testCase in testCases)
+                    testCase.result = Task.Run(() =>
+                    {
+                        Task<(bool, double)> result = Task.Run(() => { return BenchmarkSort(testCase.name, testCase.sortFunc, array); });
+                        if (result.Wait(TimeSpan.FromSeconds(60)))
+                            return result.Result;
+                        else
+                            return (false, 0);
+                    });
+                foreach (SortTestCase testCase in testCases)
                 {
-                    (bool success, double avgSec) = BenchmarkSort(testCase.name, testCase.sortFunc, array);
+                    testCase.result.Wait();
+                    (bool success, double avgSec) = testCase.result.Result;
                     if (!success)
                         Console.BackgroundColor = ConsoleColor.Red;
                     Console.Write($" {avgSec,12:g7} |");
@@ -300,6 +313,7 @@ namespace lesson._05.cs
                 Console.WriteLine("");
             }
             Console.WriteLine("");
+            Console.ReadKey();
         }
     }
 }
