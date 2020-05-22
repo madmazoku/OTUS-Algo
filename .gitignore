@@ -341,3 +341,4 @@ healthchecksdb
 
 # Custom exclude
 /lesson.06.data/[0-9].*/**
+/lesson.02.extra/4.Fibo/**
