@@ -56,6 +56,8 @@ namespace lesson._06.cs
                 Console.BufferWidth = Console.WindowWidth = width;
             else
                 Console.WindowWidth = Console.BufferWidth = width;
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.Gray;
 
             Console.WriteLine(group);
             Console.Write($"{"",10}");
@@ -90,7 +92,7 @@ namespace lesson._06.cs
                     if (exception)
                     {
                         Console.BackgroundColor = ConsoleColor.Black;
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.ForegroundColor = ConsoleColor.Gray;
                     }
                 }
                 Console.WriteLine("|");
@@ -101,18 +103,18 @@ namespace lesson._06.cs
         private List<RawTestCase> LoadTestCases()
         {
             List<RawTestCase> test_cases = new List<RawTestCase>();
-            int test_case_number = 0;
+            int testCaseNumber = 0;
             while (true)
             {
-                string inFile = $"{path}\\test.{test_case_number}.in";
-                string outFile = $"{path}\\test.{test_case_number}.out";
+                string inFile = $"{path}\\test.{testCaseNumber}.in";
+                string outFile = $"{path}\\test.{testCaseNumber}.out";
                 if (!File.Exists(inFile) || !File.Exists(outFile))
                     break;
 
                 string[] given = File.ReadAllLines(inFile).Select(x => x.Trim()).ToArray();
                 string[] expect = File.ReadAllLines(outFile).Select(x => x.Trim()).ToArray();
-                test_cases.Add(new RawTestCase(test_case_number, given, expect));
-                ++test_case_number;
+                test_cases.Add(new RawTestCase(testCaseNumber, given, expect));
+                ++testCaseNumber;
             }
             return test_cases;
         }
