@@ -15,6 +15,7 @@ namespace lesson._06.cs
             tester.Add(new ShellTask(new GonnetSequence()));
             tester.Add(new HeapTask());
             tester.Add(new QuickTask());
+            tester.Add(new MergeTask());
             tester.RunTests();
             Console.WriteLine("");
         }
