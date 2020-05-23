@@ -22,6 +22,7 @@ namespace lesson._06.cs
 
             do
             {
+                token.ThrowIfCancellationRequested();
                 if (left < mid && (right == end || tmpArray[left] < tmpArray[right]))
                 {
                     array[mergeIdnex] = tmpArray[left];
