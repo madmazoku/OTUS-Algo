@@ -14,7 +14,7 @@ namespace lesson._06.cs
 
         static void Merge(int[] tmpArray, int[] array, int start, int mid, int end, CancellationToken token)
         {
-            int mergeIdnex = start;
+            int mergeIndex = start;
             int left = start;
             int right = mid;
 
@@ -25,16 +25,16 @@ namespace lesson._06.cs
                 token.ThrowIfCancellationRequested();
                 if (left < mid && (right == end || tmpArray[left] < tmpArray[right]))
                 {
-                    array[mergeIdnex] = tmpArray[left];
+                    array[mergeIndex] = tmpArray[left];
                     ++left;
                 }
                 else
                 {
-                    array[mergeIdnex] = tmpArray[right];
+                    array[mergeIndex] = tmpArray[right];
                     ++right;
                 }
-                ++mergeIdnex;
-            } while (mergeIdnex < end);
+                ++mergeIndex;
+            } while (mergeIndex < end);
 
         }
 
