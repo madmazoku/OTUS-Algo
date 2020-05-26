@@ -12,48 +12,40 @@ namespace lesson._06.cs
             MergeSort(sortArray, token);
         }
 
-        static void Merge(int[] tmpArray, int[] array, int start, int mid, int end, CancellationToken token)
+        static void Merge(int[] aux, int[] array, int start, int mid, int end, CancellationToken token)
         {
-            int mergeIndex = start;
+            Array.Copy(array, start, aux, start, mid - start);
             int left = start;
             int right = mid;
-
-            Array.Copy(array, start, tmpArray, start, end - start);
-
-            do
+            int index = start;
+            while (left < mid && right < end)
             {
                 token.ThrowIfCancellationRequested();
-                if (left < mid && (right == end || tmpArray[left] < tmpArray[right]))
-                {
-                    array[mergeIndex] = tmpArray[left];
-                    ++left;
-                }
+                if (aux[left] < array[right])
+                    array[index++] = aux[left++];
                 else
-                {
-                    array[mergeIndex] = tmpArray[right];
-                    ++right;
-                }
-                ++mergeIndex;
-            } while (mergeIndex < end);
-
-        }
-
-        static void Sort(int[] tmpArray, int[] array, int start, int end, CancellationToken token)
-        {
-            if (start + 1 == end)
-                return;
-
-            int mid = (start + end) >> 1;
-            Sort(tmpArray, array, start, mid, token);
-            Sort(tmpArray, array, mid, end, token);
-            Merge(tmpArray, array, start, mid, end, token);
+                    array[index++] = array[right++];
+            }
+            Array.Copy(aux, left, array, index, mid - left);
         }
 
         static void MergeSort(int[] array, CancellationToken token)
         {
-            int[] tmpArray = new int[array.Length];
-
-            Sort(tmpArray, array, 0, array.Length, token);
+            int[] aux = new int[array.Length];
+            for (int size = 1; size < array.Length; size <<= 1)
+            {
+                for (int start = 0; start < array.Length; start += (size << 1))
+                {
+                    int mid = start + size;
+                    int end = mid + size;
+                    if (mid < array.Length)
+                    {
+                        if (end > array.Length)
+                            end = array.Length;
+                        Merge(aux, array, array.Length - end, array.Length - mid, array.Length - start, token);
+                    }
+                }
+            }
         }
     }
 }

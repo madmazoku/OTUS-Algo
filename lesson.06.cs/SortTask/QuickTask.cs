@@ -14,9 +14,8 @@ namespace lesson._06.cs
 
         static int PartArray(int[] array, int leftIndex, int rightIndex, CancellationToken token)
         {
-            int pivotIndex = (leftIndex + rightIndex) >> 1;
-            if (pivotIndex != leftIndex)
-                Utils.Swap(array, leftIndex, pivotIndex, token);
+            int pivotIndex = leftIndex + ((rightIndex - leftIndex + 1) >> 1);
+            Utils.Swap(array, leftIndex, pivotIndex, token);
 
             int pivot = array[leftIndex];
             int left = leftIndex;
@@ -29,42 +28,40 @@ namespace lesson._06.cs
                 while (array[--right] > pivot)
                     if (right == leftIndex)
                         break;
+
                 if (left >= right)
                     break;
                 Utils.Swap(array, left, right, token);
             }
 
-            if (leftIndex != right)
-                Utils.Swap(array, leftIndex, right, token);
+            Utils.Swap(array, leftIndex, right, token);
             return right;
         }
 
         static void QuickSort(int[] array, CancellationToken token)
         {
-            if (array.Length == 1)
+            if (array.Length <= 1)
                 return;
 
-            Stack<(int, int)> parts = new Stack<(int, int)>(100);
-            parts.Push((0, array.Length - 1));
-            while (parts.Count > 0)
+            Stack<(int, int)> stack = new Stack<(int, int)>();
+            stack.Push((0, array.Length));
+            while (stack.Count > 0)
             {
-                (int leftIndex, int rightIndex) = parts.Pop();
-
-                int midIndex = PartArray(array, leftIndex, rightIndex, token);
-
-                if (midIndex - leftIndex < rightIndex - midIndex)
+                (int start, int end) = stack.Pop();
+                int p = PartArray(array, start, end - 1, token);
+                if (p - start < end - p - 1)
                 {
-                    if (midIndex + 1 < rightIndex)
-                        parts.Push((midIndex + 1, rightIndex));
-                    if (leftIndex < midIndex - 1)
-                        parts.Push((leftIndex, midIndex - 1));
+                    if (p + 2 < end)
+                        stack.Push((p + 1, end));
+                    if (start + 1 < p)
+                        stack.Push((start, p));
                 }
                 else
                 {
-                    if (midIndex + 1 < rightIndex)
-                        parts.Push((midIndex + 1, rightIndex));
-                    if (leftIndex < midIndex - 1)
-                        parts.Push((leftIndex, midIndex - 1));
+                    if (start + 1 < p)
+                        stack.Push((start, p));
+                    if (p + 2 < end)
+                        stack.Push((p + 1, end));
                 }
             }
         }

@@ -25,6 +25,9 @@ namespace lesson._06.cs
         {
             token.ThrowIfCancellationRequested();
 
+            if (leftIndex == rightIndex)
+                return;
+
             int t = array[leftIndex];
             array[leftIndex] = array[rightIndex];
             array[rightIndex] = t;
