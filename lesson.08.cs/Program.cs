@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Security.Cryptography;
 
 namespace lesson._08.cs
@@ -115,33 +116,35 @@ namespace lesson._08.cs
         {
             if (right - left <= 5)
             {
-                Array.Sort(array, left, right - left);
-                return array[left + ((right - left) >> 1)];
+                Array.Copy(array, left, aux, left, right - left);
+                Array.Sort(aux, left, right - left);
+                return aux[left + ((right - left) >> 1)];
             }
-
 
             int pivotIndex = 0;
             for (int index = left; index + 5 < right; index += 5)
             {
                 Array.Sort(array, index, 5);
-                aux[pivotIndex++] = array[index + 3];
+                aux[pivotIndex++] = array[index + 2];
             }
             Array.Sort(aux, 0, pivotIndex);
             return aux[pivotIndex >> 1];
         }
 
-        static int Part(int[] aux, int[] array, int left, int right, int pivot)
+        static (int, int) Part(int[] aux, int[] array, int left, int right, int pivot)
         {
             int pLeft = left;
             int pRight = right; 
             for (int index = left; index < right; ++index)
-                if (array[index] <= pivot)
+                if (array[index] < pivot)
                     aux[pLeft++] = array[index];
-                else
+                else if (array[index] > pivot)
                     aux[--pRight] = array[index];
+            for (int index = pLeft; index < pRight; ++index)
+                aux[index] = pivot;
             Array.Copy(aux, left, array, left, right - left);
 
-            return pRight;
+            return (pLeft, pRight);
         }
 
         static int Percentile(int[] array, int N)
@@ -150,52 +153,41 @@ namespace lesson._08.cs
 
             int left = 0;
             int right = array.Length;
-            while (N > 0 && N != right - left)
+            while (right - left > 1)
             {
                 int pivot = GetPivot(aux, array, left, right);
 
-                int mid = Part(aux, array, left, right, pivot);
+                (int pLeft, int pRight) = Part(aux, array, left, right, pivot);
 
-                if (mid - left > N)
-                    right = mid;
+                if (pLeft - left > N)
+                    right = pLeft;
+                else if (pRight - left > N)
+                    return pivot;
                 else
                 {
-                    N -= mid - left;
-                    left = mid;
+                    N -= pRight - left;
+                    left = pRight;
                 }
             }
 
-            if (N == 0)
-            {
-                int min = array[left];
-                for (int index = left + 1; index < right; ++index)
-                    if (min > array[index])
-                        min = array[index];
-
-                return min;
-            } else
-            {
-                int max = array[left];
-                for (int index = left + 1; index < right; ++index)
-                    if (max < array[index])
-                        max = array[index];
-
-                return max;
-            }
+            return array[left];
         }
 
         static void Main(string[] args)
         {
-            //int[] array = RandomArray(21, 10);
-            int[] array = { 5, 0, 2, 5, 4, 3, 8, 8, 2, 3, 1, 6, 7, 1, 6, 0, 6, 0, 3, 3, 9 };
-            int[] arrayCopy = CopyArray(array);
-            int N = 6;
-            PrintArray("original", array);
-            Array.Sort(arrayCopy);
-            PrintArray("sorted", arrayCopy);
-            int percentile = Percentile(array, N);
-            Console.WriteLine($"     percentile {N} is {percentile}");
-            Console.WriteLine($"real percentile {N} is {arrayCopy[N]}");
+            Random rand = new Random();
+            for (int attempt = 0; attempt < 100; ++attempt) { 
+                int[] array = RandomArray(1000000, 10);
+                //int[] array = { 5, 0, 2, 5, 4, 3, 8, 8, 2, 3, 1, 6, 7, 1, 6, 0, 6, 0, 3, 3, 9 };
+                int[] arrayCopy = CopyArray(array);
+                int N = (int)(array.Length * rand.NextDouble());
+                //PrintArray($"{attempt,4} original", array);
+                Array.Sort(arrayCopy);
+                //PrintArray($"{attempt,4} sorted", arrayCopy);
+                int percentile = Percentile(array, N);
+                Console.WriteLine($"{attempt,4}: percentile {N} is {percentile}; real is {arrayCopy[N]}");
+                Debug.Assert(percentile == arrayCopy[N]);
+            }
         }
     }
 }
