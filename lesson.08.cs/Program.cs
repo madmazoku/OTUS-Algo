@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Security.Cryptography;
 
 namespace lesson._08.cs
 {
     class Program
     {
+        /***********************************************************
+         * Out of Homework Code                                    *
+         ***********************************************************/
+        /*
         static void PrintArray(string name, int[] array)
         {
             Console.WriteLine($"{name,20}: ");
@@ -58,7 +59,8 @@ namespace lesson._08.cs
             int[] aux = new int[array.Length];
 
             int d = 1;
-            while (d <= max) {
+            while (d <= max)
+            {
                 CountSort(aux, array, R, x => (x / d) % R);
                 d *= R;
             }
@@ -95,7 +97,7 @@ namespace lesson._08.cs
                 else
                 {
                     Node prevNode = null;
-                    while(node != null && node.value < value)
+                    while (node != null && node.value < value)
                     {
                         prevNode = node;
                         node = node.next;
@@ -107,8 +109,8 @@ namespace lesson._08.cs
                 }
             }
 
-            for(int index = 0, bucketIndex = 0; bucketIndex < B; ++bucketIndex)
-                for(Node node = buckets[bucketIndex]; node != null; node = node.next)
+            for (int index = 0, bucketIndex = 0; bucketIndex < B; ++bucketIndex)
+                for (Node node = buckets[bucketIndex]; node != null; node = node.next)
                     array[index++] = node.value;
         }
 
@@ -134,7 +136,7 @@ namespace lesson._08.cs
         static (int, int) Part(int[] aux, int[] array, int left, int right, int pivot)
         {
             int pLeft = left;
-            int pRight = right; 
+            int pRight = right;
             for (int index = left; index < right; ++index)
                 if (array[index] < pivot)
                     aux[pLeft++] = array[index];
@@ -172,22 +174,37 @@ namespace lesson._08.cs
 
             return array[left];
         }
+        */
+
+        static void TestFileSorts()
+        {
+            Tester tester = new Tester("File Sorts", 8);
+
+            tester.Add(new MergeFileSort(new MergeMemorySort(64, new QuickMemorySort()), 10));
+            tester.Add(new MergeFileSort(new MergeMemorySort(64, new QuickMemorySort()), 100));
+            tester.Add(new MergeFileSort(new MergeMemorySort(64, new QuickMemorySort()), 1_000));
+            tester.Add(new MergeFileSort(new QuickMemorySort(), 10));
+            tester.Add(new MergeFileSort(new QuickMemorySort(), 100));
+            tester.Add(new MergeFileSort(new QuickMemorySort(), 1_000));
+            tester.Add(new MMFFileSort(new QuickMMFSort()));
+            tester.Add(new MMFFileSort(new HeapMMFSort()));
+            tester.Add(new BucketFileSort(10));
+            tester.Add(new BucketFileSort(100));
+            tester.Add(new BucketFileSort(1_000));
+            tester.Add(new CounterFileSort());
+            tester.Add(new RadixFileSort());
+
+            long[] arraySizes = { 10_000, 100_000, 1_000_000 };
+
+            tester.RunTests(arraySizes);
+        }
 
         static void Main(string[] args)
         {
-            Random rand = new Random();
-            for (int attempt = 0; attempt < 100; ++attempt) { 
-                int[] array = RandomArray(1000000, 10);
-                //int[] array = { 5, 0, 2, 5, 4, 3, 8, 8, 2, 3, 1, 6, 7, 1, 6, 0, 6, 0, 3, 3, 9 };
-                int[] arrayCopy = CopyArray(array);
-                int N = (int)(array.Length * rand.NextDouble());
-                //PrintArray($"{attempt,4} original", array);
-                Array.Sort(arrayCopy);
-                //PrintArray($"{attempt,4} sorted", arrayCopy);
-                int percentile = Percentile(array, N);
-                Console.WriteLine($"{attempt,4}: percentile {N} is {percentile}; real is {arrayCopy[N]}");
-                Debug.Assert(percentile == arrayCopy[N]);
-            }
+            TestFileSorts();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
     }
 }
