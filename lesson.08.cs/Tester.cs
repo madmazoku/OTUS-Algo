@@ -17,8 +17,8 @@ namespace lesson._08.cs
         {
             this.group = group;
 
-            //tmpPath = Directory.CreateDirectory(Path.Combine("E://Temp", $"lessong.{lesson:d2}." + Path.GetRandomFileName()));
-            tmpPath = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), $"lessong.{lesson:d2}." + Path.GetRandomFileName()));
+            tmpPath = Directory.CreateDirectory(Path.Combine("E://Temp", $"lessong.{lesson:d2}." + Path.GetRandomFileName()));
+            //tmpPath = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), $"lessong.{lesson:d2}." + Path.GetRandomFileName()));
             innerSorts = new List<IFileSort>();
 
             Console.WriteLine($"Created temporary directory {tmpPath.FullName}");

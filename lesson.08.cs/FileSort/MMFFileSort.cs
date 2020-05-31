@@ -1,32 +1,26 @@
 ﻿using System;
 using System.IO;
-using System.IO.MemoryMappedFiles;
 
 namespace lesson._08.cs
 {
     class MMFFileSort : IFileSort
     {
-        IMMFSort mmfSort;
+        IMASort maSort;
 
-        public MMFFileSort(IMMFSort mmfSort)
+        public MMFFileSort(IMASort maSort)
         {
-            this.mmfSort = mmfSort;
+            this.maSort = maSort;
         }
 
-        public string Name() { return $"MMF.{mmfSort.Name()}"; }
+        public string Name() { return $"MMF.{maSort.Name()}"; }
 
         public void Sort(FileInfo fileSource, FileInfo fileDestination)
         {
             File.Copy(fileSource.FullName, fileDestination.FullName);
             fileDestination.Refresh();
-            MemoryMappedFile mmf = MemoryMappedFile.CreateFromFile(fileDestination.FullName);
-            MemoryMappedViewAccessor mmva = mmf.CreateViewAccessor();
 
-            mmfSort.Sort(mmva, 0, fileDestination.Length / sizeof(UInt16));
-
-            mmva.Flush();
-            mmva.Dispose();
-            mmf.Dispose();
+            IMemoryAcessor ma = new FileMemoryAccessor(fileDestination);
+            maSort.Sort(ma, 0, fileDestination.Length / sizeof(UInt16));
         }
 
     }

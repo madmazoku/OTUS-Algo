@@ -47,5 +47,12 @@ namespace lesson._08.cs
             mmva.Write(left * sizeof(UInt16), mmva.ReadUInt16(right * sizeof(UInt16)));
             mmva.Write(right * sizeof(UInt16), t);
         }
+
+        static public void Copy(IMemoryAcessor source, long sourceIndex, IMemoryAcessor destination, long destinationIndex, long length)
+        {
+            for (long index = 0; index < length; ++index)
+                destination.Write(destinationIndex + index, source.Read(sourceIndex + index));
+        }
+
     }
 }

@@ -180,14 +180,15 @@ namespace lesson._08.cs
         {
             Tester tester = new Tester("File Sorts", 8);
 
-            tester.Add(new MergeFileSort(new MergeMemorySort(64, new QuickMemorySort()), 10));
-            tester.Add(new MergeFileSort(new MergeMemorySort(64, new QuickMemorySort()), 100));
-            tester.Add(new MergeFileSort(new MergeMemorySort(64, new QuickMemorySort()), 1_000));
-            tester.Add(new MergeFileSort(new QuickMemorySort(), 10));
-            tester.Add(new MergeFileSort(new QuickMemorySort(), 100));
-            tester.Add(new MergeFileSort(new QuickMemorySort(), 1_000));
-            tester.Add(new MMFFileSort(new QuickMMFSort()));
-            tester.Add(new MMFFileSort(new HeapMMFSort()));
+            tester.Add(new MergeFileSort(new MergeMASort(64, new QuickMASort()), 10));
+            tester.Add(new MergeFileSort(new MergeMASort(64, new QuickMASort()), 100));
+            tester.Add(new MergeFileSort(new MergeMASort(64, new QuickMASort()), 1_000));
+            tester.Add(new MergeFileSort(new QuickMASort(), 10));
+            tester.Add(new MergeFileSort(new QuickMASort(), 100));
+            tester.Add(new MergeFileSort(new QuickMASort(), 1_000));
+            tester.Add(new MMFFileSort(new QuickMASort()));
+            tester.Add(new MMFFileSort(new HeapMASort()));
+
             tester.Add(new BucketFileSort(10));
             tester.Add(new BucketFileSort(100));
             tester.Add(new BucketFileSort(1_000));

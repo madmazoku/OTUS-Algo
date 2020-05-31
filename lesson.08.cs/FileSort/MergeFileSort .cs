@@ -6,16 +6,16 @@ namespace lesson._08.cs
 {
     class MergeFileSort : IFileSort
     {
-        IMemorySort outerSort;
+        IMASort maSort;
         int divider;
 
-        public MergeFileSort(IMemorySort outerSort, int divider)
+        public MergeFileSort(IMASort maSort, int divider)
         {
-            this.outerSort = outerSort;
+            this.maSort = maSort;
             this.divider = divider;
         }
 
-        public string Name() { return $"Merge.{divider}.{outerSort.Name()}"; }
+        public string Name() { return $"Merge.{divider}.{maSort.Name()}"; }
 
         public void Sort(FileInfo fileSource, FileInfo fileDestination)
         {
@@ -26,17 +26,18 @@ namespace lesson._08.cs
                 throw new Exception("Too small divider");
             int step = (int)stepLong;
 
-            Queue<FileInfo> fileParts = SortParts(fileSource, fileDestination, step, outerSort);
+            Queue<FileInfo> fileParts = SortParts(fileSource, fileDestination, step, maSort);
             MergeParts(fileParts, fileDestination);
         }
 
-        private Queue<FileInfo> SortParts(FileInfo fileSource, FileInfo fileDestination, int step, IMemorySort outerSort)
+        private Queue<FileInfo> SortParts(FileInfo fileSource, FileInfo fileDestination, int step, IMASort maSort)
         {
             string tmpFileName = Path.GetFileNameWithoutExtension(fileDestination.Name);
             int bufferSize = step * sizeof(UInt16);
 
             byte[] buffer = new byte[bufferSize];
             UInt16[] array = new UInt16[step];
+            IMemoryAcessor ma = new ArrayMemoryAccessor(array);
 
             FileStream streamSource = fileSource.OpenRead();
             Queue<FileInfo> fileParts = new Queue<FileInfo>();
@@ -48,7 +49,7 @@ namespace lesson._08.cs
                 if (readBytes > 0)
                 {
                     Buffer.BlockCopy(buffer, 0, array, 0, readBytes);
-                    outerSort.Sort(array, 0, readBytes / sizeof(UInt16));
+                    maSort.Sort(ma, 0, readBytes / sizeof(UInt16));
                     Buffer.BlockCopy(array, 0, buffer, 0, readBytes);
 
                     FileInfo filePart = new FileInfo(Path.Combine(fileDestination.DirectoryName, tmpFileName + $".partial.{fileParts.Count}" + fileDestination.Extension));
