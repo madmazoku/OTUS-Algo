@@ -195,7 +195,7 @@ namespace lesson._08.cs
             tester.Add(new CounterFileSort());
             tester.Add(new RadixFileSort());
 
-            long[] arraySizes = { 10_000, 100_000, 1_000_000 };
+            long[] arraySizes = { 10_000, 100_000, 1_000_000, 10_000_000, 100_000_000, 1_000_000_000 };
 
             tester.RunTests(arraySizes);
         }

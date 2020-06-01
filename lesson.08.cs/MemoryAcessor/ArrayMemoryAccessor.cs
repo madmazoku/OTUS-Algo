@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace lesson._08.cs
 {
@@ -36,8 +37,10 @@ namespace lesson._08.cs
             array[index] = value;
         }
 
-        public void Swap(long left, long right)
+        public void Swap(long left, long right, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
+
             if (left == right)
                 return;
 

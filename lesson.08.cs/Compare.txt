@@ -1,0 +1,85 @@
+﻿File Sorts
+        ArraySize: 10^4 (10000)
+                          Merge.10.Merge.Quick:   0.127812
+                         Merge.100.Merge.Quick:   0.246873
+                        Merge.1000.Merge.Quick:  0.9719945
+                                Merge.10.Quick:  0.1263614
+                               Merge.100.Quick:  0.2493033
+                              Merge.1000.Quick:  0.9476105
+                                     MMF.Quick:  0.0955774
+                                      MMF.Heap:  0.0616657
+                                     Bucket.10:    0.01468
+                                    Bucket.100:  0.0372855
+                                   Bucket.1000:  0.0553979
+                                       Counter:  0.0341295
+                                         Radix:  0.0838106
+        ArraySize: 10^5 (100000)
+                          Merge.10.Merge.Quick:  0.1423284
+                         Merge.100.Merge.Quick:  0.2678879
+                        Merge.1000.Merge.Quick:  1.1381353
+                                Merge.10.Quick:  0.1285176
+                               Merge.100.Quick:  0.2612921
+                              Merge.1000.Quick:  1.1623287
+                                     MMF.Quick:  0.1836104
+                                      MMF.Heap:  0.4093984
+                                     Bucket.10:  0.0860214
+                                    Bucket.100:   0.111624
+                                   Bucket.1000:  0.5015563
+                                       Counter:  0.0506308
+                                         Radix:   0.177644
+        ArraySize: 10^6 (1000000)
+                          Merge.10.Merge.Quick:  0.9551082
+                         Merge.100.Merge.Quick:  1.2324825
+                        Merge.1000.Merge.Quick:  2.3899364
+                                Merge.10.Quick:  0.7923085
+                               Merge.100.Quick:   1.056309
+                              Merge.1000.Quick:  2.2577137
+                                     MMF.Quick:   2.043855
+                                      MMF.Heap:  4.2871217
+                                     Bucket.10:  0.5234022
+                                    Bucket.100:  2.7357983
+                                   Bucket.1000:  15.355413
+                                       Counter:  0.3505468
+                                         Radix:  0.9502958
+        ArraySize: 10^7 (10000000)
+                          Merge.10.Merge.Quick:  12.665665
+                         Merge.100.Merge.Quick:  14.698413
+                        Merge.1000.Merge.Quick:  16.383404
+                                Merge.10.Quick:  10.065211
+                               Merge.100.Quick:  13.664625
+                              Merge.1000.Quick:  15.965738
+                                     MMF.Quick:  21.217718
+                                      MMF.Heap:   49.33258
+                                     Bucket.10:  10.618078
+                                    Bucket.100:  10.034275
+                                   Bucket.1000:  222.74544
+                                       Counter:  2.8497207
+                                         Radix:  13.447574
+        ArraySize: 10^8 (100000000)
+                          Merge.10.Merge.Quick:  189.32333
+                         Merge.100.Merge.Quick:  199.05832
+                        Merge.1000.Merge.Quick:  211.54632
+                                Merge.10.Quick:  141.99107
+                               Merge.100.Quick:   154.6787
+                              Merge.1000.Quick:  173.16993
+                                     MMF.Quick:  268.26135
+                                      MMF.Heap:  612.00642
+                                     Bucket.10:  156.12203
+                                    Bucket.100:  155.16561
+                                   Bucket.1000:  149.79439
+                                       Counter:  42.238592
+                                         Radix:  160.11622
+        ArraySize: 10^9 (1000000000)
+                          Merge.10.Merge.Quick:    Timeout
+                         Merge.100.Merge.Quick:    Timeout
+                        Merge.1000.Merge.Quick:    Timeout
+                                Merge.10.Quick:  2347.9295
+                               Merge.100.Quick:  3540.7506
+                              Merge.1000.Quick:    Timeout
+                                     MMF.Quick:    Timeout
+                                      MMF.Heap:    Timeout
+                                     Bucket.10:  3269.6173
+                                    Bucket.100:  3156.4344
+                                   Bucket.1000:  3111.1484
+                                       Counter:  461.93768
+                                         Radix:    Timeout

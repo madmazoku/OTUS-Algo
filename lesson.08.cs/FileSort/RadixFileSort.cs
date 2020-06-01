@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 
 namespace lesson._08.cs
 {
@@ -9,7 +10,7 @@ namespace lesson._08.cs
 
         public string Name() { return "Radix"; }
 
-        public void Sort(FileInfo fileSource, FileInfo fileDestination)
+        public void Sort(FileInfo fileSource, FileInfo fileDestination, CancellationToken token)
         {
             string tmpFileName = Path.GetFileNameWithoutExtension(fileDestination.Name);
             FileInfo fileTmp = new FileInfo(Path.Combine(fileSource.DirectoryName, tmpFileName + $".tmp" + fileDestination.Extension));
@@ -38,6 +39,8 @@ namespace lesson._08.cs
                 FileStream streamTmp = fileTmp.OpenRead();
                 while (streamTmp.Read(buffer) != 0)
                 {
+                    token.ThrowIfCancellationRequested();
+
                     UInt16 value = BitConverter.ToUInt16(buffer);
                     value /= divider;
                     hasAnotherDigit = hasAnotherDigit || (value >= radix);
@@ -52,7 +55,10 @@ namespace lesson._08.cs
 
                     streamTmps[index] = fileTmps[index].OpenRead();
                     while (streamTmps[index].Read(buffer) != 0)
+                    {
+                        token.ThrowIfCancellationRequested();
                         streamDestination.Write(buffer);
+                    }
                     streamTmps[index].Close();
 
                     fileTmps[index].Delete();

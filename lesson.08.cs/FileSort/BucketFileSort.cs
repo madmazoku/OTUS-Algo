@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 
 namespace lesson._08.cs
 {
@@ -13,9 +14,9 @@ namespace lesson._08.cs
         }
 
         public string Name() { return $"Bucket.{bucketSize}"; }
-        public void Sort(FileInfo fileSource, FileInfo fileDestination)
+        public void Sort(FileInfo fileSource, FileInfo fileDestination, CancellationToken token)
         {
-            BucketSort(fileSource, fileDestination, bucketSize);
+            BucketSort(fileSource, fileDestination, bucketSize, token);
         }
 
         class Node
@@ -30,7 +31,7 @@ namespace lesson._08.cs
             }
         }
 
-        static void BucketSort(FileInfo fileSource, FileInfo fileDestination, long bucketSize)
+        static void BucketSort(FileInfo fileSource, FileInfo fileDestination, long bucketSize, CancellationToken token)
         {
             long arraySize = fileSource.Length / sizeof(UInt16);
             long bucketCount = arraySize / bucketSize;
@@ -41,6 +42,8 @@ namespace lesson._08.cs
             FileStream streamSource = fileSource.OpenRead();
             while (streamSource.Read(buffer) == sizeof(UInt16))
             {
+                token.ThrowIfCancellationRequested();
+
                 UInt16 value = BitConverter.ToUInt16(buffer);
                 long bucketIndex = bucketCount * value / maxValue;
 
@@ -67,6 +70,7 @@ namespace lesson._08.cs
             for (long bucketIndex = 0; bucketIndex < bucketCount; ++bucketIndex)
                 for (Node node = buckets[bucketIndex]; node != null; node = node.next)
                 {
+                    token.ThrowIfCancellationRequested();
                     BitConverter.TryWriteBytes(buffer, node.value);
                     streamDestination.Write(buffer);
                 }

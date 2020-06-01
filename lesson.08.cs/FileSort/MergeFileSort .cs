@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace lesson._08.cs
 {
@@ -17,7 +18,7 @@ namespace lesson._08.cs
 
         public string Name() { return $"Merge.{divider}.{maSort.Name()}"; }
 
-        public void Sort(FileInfo fileSource, FileInfo fileDestination)
+        public void Sort(FileInfo fileSource, FileInfo fileDestination, CancellationToken token)
         {
             long arraySize = fileSource.Length / sizeof(UInt16);
             long stepLong = arraySize / divider;
@@ -26,11 +27,11 @@ namespace lesson._08.cs
                 throw new Exception("Too small divider");
             int step = (int)stepLong;
 
-            Queue<FileInfo> fileParts = SortParts(fileSource, fileDestination, step, maSort);
-            MergeParts(fileParts, fileDestination);
+            Queue<FileInfo> fileParts = SortParts(fileSource, fileDestination, step, maSort, token);
+            MergeParts(fileParts, fileDestination, token);
         }
 
-        private Queue<FileInfo> SortParts(FileInfo fileSource, FileInfo fileDestination, int step, IMASort maSort)
+        private Queue<FileInfo> SortParts(FileInfo fileSource, FileInfo fileDestination, int step, IMASort maSort, CancellationToken token)
         {
             string tmpFileName = Path.GetFileNameWithoutExtension(fileDestination.Name);
             int bufferSize = step * sizeof(UInt16);
@@ -44,12 +45,14 @@ namespace lesson._08.cs
 
             while (true)
             {
+                token.ThrowIfCancellationRequested();
+
                 int readBytes = streamSource.Read(buffer);
 
                 if (readBytes > 0)
                 {
                     Buffer.BlockCopy(buffer, 0, array, 0, readBytes);
-                    maSort.Sort(ma, 0, readBytes / sizeof(UInt16));
+                    maSort.Sort(ma, 0, readBytes / sizeof(UInt16), token);
                     Buffer.BlockCopy(array, 0, buffer, 0, readBytes);
 
                     FileInfo filePart = new FileInfo(Path.Combine(fileDestination.DirectoryName, tmpFileName + $".partial.{fileParts.Count}" + fileDestination.Extension));
@@ -69,7 +72,7 @@ namespace lesson._08.cs
             return fileParts;
         }
 
-        private void MergeParts(Queue<FileInfo> fileParts, FileInfo fileDestination)
+        private void MergeParts(Queue<FileInfo> fileParts, FileInfo fileDestination, CancellationToken token)
         {
             string tmpFileName = Path.GetFileNameWithoutExtension(fileDestination.Name);
             byte[] buffer1 = new byte[sizeof(UInt16)];
@@ -94,6 +97,8 @@ namespace lesson._08.cs
 
                 while (true)
                 {
+                    token.ThrowIfCancellationRequested();
+
                     if (!hasValuePart1)
                     {
                         hasValuePart1 = streamPart1.Read(buffer1) == sizeof(UInt16);
@@ -128,13 +133,19 @@ namespace lesson._08.cs
                 {
                     streamMerged.Write(buffer1);
                     while (streamPart1.Read(buffer1) == sizeof(UInt16))
+                    {
+                        token.ThrowIfCancellationRequested();
                         streamMerged.Write(buffer1);
+                    }
                 }
                 else if (hasValuePart2)
                 {
                     streamMerged.Write(buffer2);
                     while (streamPart2.Read(buffer2) == sizeof(UInt16))
+                    {
+                        token.ThrowIfCancellationRequested();
                         streamMerged.Write(buffer2);
+                    }
                 }
 
                 streamPart1.Close();

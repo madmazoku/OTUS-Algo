@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Threading;
 
 namespace lesson._08.cs
 {
@@ -48,10 +49,13 @@ namespace lesson._08.cs
             mmva.Write(right * sizeof(UInt16), t);
         }
 
-        static public void Copy(IMemoryAcessor source, long sourceIndex, IMemoryAcessor destination, long destinationIndex, long length)
+        static public void Copy(IMemoryAcessor source, long sourceIndex, IMemoryAcessor destination, long destinationIndex, long length, CancellationToken token)
         {
             for (long index = 0; index < length; ++index)
+            {
+                token.ThrowIfCancellationRequested();
                 destination.Write(destinationIndex + index, source.Read(sourceIndex + index));
+            }
         }
 
     }

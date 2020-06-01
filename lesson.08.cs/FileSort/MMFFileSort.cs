@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 
 namespace lesson._08.cs
 {
@@ -14,13 +15,13 @@ namespace lesson._08.cs
 
         public string Name() { return $"MMF.{maSort.Name()}"; }
 
-        public void Sort(FileInfo fileSource, FileInfo fileDestination)
+        public void Sort(FileInfo fileSource, FileInfo fileDestination, CancellationToken token)
         {
             File.Copy(fileSource.FullName, fileDestination.FullName);
             fileDestination.Refresh();
 
             IMemoryAcessor ma = new FileMemoryAccessor(fileDestination);
-            maSort.Sort(ma, 0, fileDestination.Length / sizeof(UInt16));
+            maSort.Sort(ma, 0, fileDestination.Length / sizeof(UInt16), token);
         }
 
     }

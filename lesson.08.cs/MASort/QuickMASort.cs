@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace lesson._08.cs
 {
@@ -7,15 +8,15 @@ namespace lesson._08.cs
     {
         public string Name() { return "Quick"; }
 
-        public void Sort(IMemoryAcessor ma, long start, long end)
+        public void Sort(IMemoryAcessor ma, long start, long end, CancellationToken token)
         {
-            QuickSort(ma, start, end);
+            QuickSort(ma, start, end, token);
         }
 
-        static long PartArray(IMemoryAcessor ma, long leftIndex, long rightIndex)
+        static long PartArray(IMemoryAcessor ma, long leftIndex, long rightIndex, CancellationToken token)
         {
             long pivotIndex = leftIndex + ((rightIndex - leftIndex + 1) >> 1);
-            ma.Swap(leftIndex, pivotIndex);
+            ma.Swap(leftIndex, pivotIndex, token);
 
             UInt16 pivot = ma.Read(leftIndex);
             long left = leftIndex;
@@ -31,14 +32,14 @@ namespace lesson._08.cs
 
                 if (left >= right)
                     break;
-                ma.Swap(left, right);
+                ma.Swap(left, right, token);
             }
 
-            ma.Swap(leftIndex, right);
+            ma.Swap(leftIndex, right, token);
             return right;
         }
 
-        static void QuickSort(IMemoryAcessor ma, long start, long end)
+        static void QuickSort(IMemoryAcessor ma, long start, long end, CancellationToken token)
         {
             if (end - start <= 1)
                 return;
@@ -48,7 +49,7 @@ namespace lesson._08.cs
             while (stack.Count > 0)
             {
                 (long startInner, long endInner) = stack.Pop();
-                long p = PartArray(ma, startInner, endInner - 1);
+                long p = PartArray(ma, startInner, endInner - 1, token);
                 if (p - startInner < endInner - p - 1)
                 {
                     if (p + 2 < endInner)
