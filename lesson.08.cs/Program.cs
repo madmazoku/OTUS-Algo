@@ -194,6 +194,7 @@ namespace lesson._08.cs
             tester.Add(new BucketFileSort(1_000));
             tester.Add(new CounterFileSort());
             tester.Add(new RadixFileSort());
+            tester.Add(new BinRadixFileSort());
 
             long[] arraySizes = { 10_000, 100_000, 1_000_000, 10_000_000, 100_000_000, 1_000_000_000 };
 
