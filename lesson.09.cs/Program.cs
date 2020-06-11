@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace lesson._09.cs
 {
@@ -189,26 +185,45 @@ namespace lesson._09.cs
         //    }
         //}
 
-        static void Main(string[] args)
+        static void TestSimple()
         {
-            for (int t = 0; t < 10; ++t)
+            for (int t = 0; t < 2; ++t)
             {
-                int[] keys = new int[20];
-                for (int i = 0; i < keys.Length; ++i)
-                    keys[i] = i;
-            
-                Utils.Shuffle(keys);
+                int[] inserts = Utils.MakeIndexArray(20);
+                Utils.Shuffle(inserts);
 
                 SimpleNodeTree nodeTree = new SimpleNodeTree();
 
-                for (int i = 0; i < keys.Length; ++i)
-                    nodeTree.Insert(keys[i]);
-                Utils.PrintNodes("inserts", nodeTree.Root());
+                Utils.PrintArray("Insertions", inserts);
+                for (int i = 0; i < inserts.Length; ++i)
+                {
+                    nodeTree.Insert(inserts[i]);
+                    int[] check = nodeTree.GetArray();
+                    if (check.Length != i + 1)
+                        Console.WriteLine("\tSize mismatch");
+                    if (!Utils.IsOrdered(check))
+                        Console.WriteLine("\tNot ordered");
+                    if (!Utils.IsHaveElement(check, inserts[i]))
+                        Console.WriteLine("\tInserted element not found");
+                }
+                Utils.PrintArray("Overall", nodeTree.GetArray());
 
-                Random rand = new Random();
-                int x = rand.Next(keys.Length);
-                nodeTree.Remove(x);
-                Utils.PrintNodes($"delete {x}", nodeTree.Root());
+                int[] removes = Utils.Sample(inserts, 10);
+                Utils.PrintArray("Removes", removes);
+                for (int i = 0; i < removes.Length; ++i)
+                {
+                    nodeTree.Remove(inserts[i]);
+                    int[] check = nodeTree.GetArray();
+                    if (check.Length != inserts.Length - (i + 1))
+                        Console.WriteLine("\tSize mismatch");
+                    if (!Utils.IsOrdered(check))
+                        Console.WriteLine("\tNot ordered");
+                    if (Utils.IsHaveElement(check, inserts[i]))
+                        Console.WriteLine("\tRemoved element found");
+                }
+                Utils.PrintArray("Overall", nodeTree.GetArray());
+
+                Console.WriteLine("");
 
                 //nodeTree.Print("start");
 
@@ -220,5 +235,26 @@ namespace lesson._09.cs
 
             Console.WriteLine("Hello World!");
         }
+
+        static void NodeTreeTest()
+        {
+            Tester tester = new Tester("Trees");
+            tester.Add(new SimpleNodeTree());
+            tester.Add(new RandomTestCase(10));
+            tester.Add(new RandomTestCase(100));
+            tester.Add(new RandomTestCase(1000));
+            tester.Add(new RandomTestCase(10000));
+            tester.Add(new RandomTestCase(100000));
+            tester.Add(new RandomTestCase(1000000));
+            tester.Add(new RandomTestCase(10000000));
+            tester.Add(new RandomTestCase(100000000));
+            tester.RunTests();
+        }
+
+        static void Main(string[] args)
+        {
+            NodeTreeTest();
+        }
+
     }
 }
