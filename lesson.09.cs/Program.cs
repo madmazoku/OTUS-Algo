@@ -187,10 +187,11 @@ namespace lesson._09.cs
 
         static void TestSimple()
         {
-            for (int t = 0; t < 2; ++t)
+            for (int t = 0; t < 5; ++t)
             {
                 int[] inserts = Utils.MakeIndexArray(20);
                 Utils.Shuffle(inserts);
+                //int[] inserts = { 3, 6, 2, 1, 9, 4, 7, 5, 8, 0 };
 
                 //SimpleTree nodeTree = new SimpleTree();
                 AVLTree nodeTree = new AVLTree();
@@ -210,16 +211,17 @@ namespace lesson._09.cs
                 Utils.PrintArray("Overall", nodeTree.GetArray());
 
                 int[] removes = Utils.Sample(inserts, 10);
+                //int[] removes = { 3, 6, 2, 1, 9, 4, 7, 5, 8, 0 };
                 Utils.PrintArray("Removes", removes);
                 for (int i = 0; i < removes.Length; ++i)
                 {
-                    nodeTree.Remove(inserts[i]);
+                    nodeTree.Remove(removes[i]);
                     int[] check = nodeTree.GetArray();
                     if (check.Length != inserts.Length - (i + 1))
                         Console.WriteLine("\tSize mismatch");
                     if (!Utils.IsOrdered(check))
                         Console.WriteLine("\tNot ordered");
-                    if (Utils.IsHaveElement(check, inserts[i]))
+                    if (Utils.IsHaveElement(check, removes[i]))
                         Console.WriteLine("\tRemoved element found");
                 }
                 Utils.PrintArray("Overall", nodeTree.GetArray());
