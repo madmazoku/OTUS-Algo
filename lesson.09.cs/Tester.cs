@@ -159,6 +159,8 @@ namespace lesson._09.cs
 
         (bool, double) RunTestRemove(INodeTree nodeTree, ITestCase testCase, CancellationToken token)
         {
+            return (false, 0);
+
             int[] removeArray = testCase.GetRemoveArray();
             Stopwatch sw = Stopwatch.StartNew();
             for (int index = 0; index < removeArray.Length; ++index)

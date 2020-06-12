@@ -243,7 +243,8 @@ namespace lesson._09.cs
             AVLTree nodeTree = new AVLTree();
 
             int[] inserts = Utils.MakeIndexArray(20);
-            Utils.Shuffle(inserts);
+            Array.Reverse(inserts);
+            //Utils.Shuffle(inserts);
             Utils.PrintArray("Array", inserts);
             for (int i = 0; i < inserts.Length; ++i)
                 nodeTree.Insert(inserts[i]);
@@ -278,9 +279,9 @@ namespace lesson._09.cs
 
         static void Main(string[] args)
         {
-            TestSimple();
+            //TestSimple();
             //TestArrayClone();
-            //NodeTreeTest();
+            NodeTreeTest();
         }
 
     }
