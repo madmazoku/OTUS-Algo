@@ -192,7 +192,8 @@ namespace lesson._09.cs
                 int[] inserts = Utils.MakeIndexArray(20);
                 Utils.Shuffle(inserts);
 
-                SimpleNodeTree nodeTree = new SimpleNodeTree();
+                //SimpleTree nodeTree = new SimpleTree();
+                AVLTree nodeTree = new AVLTree();
 
                 Utils.PrintArray("Insertions", inserts);
                 for (int i = 0; i < inserts.Length; ++i)
@@ -236,24 +237,50 @@ namespace lesson._09.cs
             Console.WriteLine("Hello World!");
         }
 
+        static void TestArrayClone()
+        {
+            //SimpleTree nodeTree = new SimpleTree();
+            AVLTree nodeTree = new AVLTree();
+
+            int[] inserts = Utils.MakeIndexArray(20);
+            Utils.Shuffle(inserts);
+            Utils.PrintArray("Array", inserts);
+            for (int i = 0; i < inserts.Length; ++i)
+                nodeTree.Insert(inserts[i]);
+            Utils.PrintArray("Inserted", nodeTree.GetArray());
+
+            INodeTree nodeTreeClone = nodeTree.Clone();
+            Utils.PrintArray("Cloned", nodeTreeClone.GetArray());
+
+        }
+
         static void NodeTreeTest()
         {
             Tester tester = new Tester("Trees");
-            tester.Add(new SimpleNodeTree());
-            tester.Add(new RandomTestCase(10));
+            tester.Add(new SimpleTree());
+            tester.Add(new AVLTree());
             tester.Add(new RandomTestCase(100));
+            tester.Add(new OrderedTestCase(100, false));
+            tester.Add(new OrderedTestCase(100, true));
             tester.Add(new RandomTestCase(1000));
+            tester.Add(new OrderedTestCase(1000, false));
+            tester.Add(new OrderedTestCase(1000, true));
             tester.Add(new RandomTestCase(10000));
+            tester.Add(new OrderedTestCase(10000, false));
+            tester.Add(new OrderedTestCase(10000, true));
             tester.Add(new RandomTestCase(100000));
+            tester.Add(new OrderedTestCase(100000, false));
+            tester.Add(new OrderedTestCase(100000, true));
             tester.Add(new RandomTestCase(1000000));
             tester.Add(new RandomTestCase(10000000));
-            tester.Add(new RandomTestCase(100000000));
             tester.RunTests();
         }
 
         static void Main(string[] args)
         {
-            NodeTreeTest();
+            TestSimple();
+            //TestArrayClone();
+            //NodeTreeTest();
         }
 
     }

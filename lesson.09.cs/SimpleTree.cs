@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace lesson._09.cs
 {
-    class SimpleNodeTree : INodeTree
+    class SimpleTree : INodeTree
     {
         class Node
         {
@@ -15,12 +16,12 @@ namespace lesson._09.cs
 
         Node root;
 
-        public SimpleNodeTree()
+        public SimpleTree()
         {
             this.root = null;
         }
 
-        SimpleNodeTree(Node root)
+        SimpleTree(Node root)
         {
             this.root = root;
         }
@@ -33,13 +34,51 @@ namespace lesson._09.cs
         public int[] GetArray()
         {
             List<int> list = new List<int>();
-            FillList(root, list);
+
+            Stack<(Node, bool)> stack = new Stack<(Node, bool)>();
+            stack.Push((root, true));
+            while (stack.Count > 0)
+            {
+                (Node node, bool left) = stack.Pop();
+                if (node == null)
+                    continue;
+                if(left)
+                {
+                    stack.Push((node, false));
+                    stack.Push((node.left, true));
+                } else
+                {
+                    list.Add(node.x);
+                    stack.Push((node.right, true));
+                }
+            }
+
             return list.ToArray();
         }
 
         public INodeTree Clone()
         {
-            return new SimpleNodeTree(CloneNode(root));
+            if (root == null)
+                return new SimpleTree();
+
+            Node newRoot = new Node(root.x);
+            Stack<(Node, Node, bool)> stack = new Stack<(Node, Node, bool)>();
+            stack.Push((root.left, newRoot, true));
+            stack.Push((root.right, newRoot, false));
+            while (stack.Count > 0)
+            {
+                (Node node, Node parent, bool left) = stack.Pop();
+                if (node == null)
+                    continue;
+                if (left)
+                    parent = parent.left = new Node(node.x);
+                else
+                    parent = parent.right = new Node(node.x);
+                stack.Push((node.left, parent, true));
+                stack.Push((node.right, parent, false));
+            }
+
+            return new SimpleTree(newRoot);
         }
 
         public void Insert(int x)
@@ -88,27 +127,6 @@ namespace lesson._09.cs
                 InsertNode(left);
                 InsertNode(right);
             }
-        }
-
-        void FillList(Node node, List<int> list)
-        {
-            if (node == null)
-                return;
-            FillList(node.left, list);
-            list.Add(node.x);
-            FillList(node.right, list);
-        }
-
-        Node CloneNode(Node node)
-        {
-            if (node == null)
-                return null;
-
-            Node newNode = new Node(node.x);
-            newNode.left = CloneNode(node.left);
-            newNode.right = CloneNode(node.right);
-
-            return newNode;
         }
     }
 }
