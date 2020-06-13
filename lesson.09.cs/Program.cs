@@ -194,7 +194,8 @@ namespace lesson._09.cs
                 //int[] inserts = { 3, 6, 2, 1, 9, 4, 7, 5, 8, 0 };
 
                 //SimpleTree nodeTree = new SimpleTree();
-                AVLTree nodeTree = new AVLTree();
+                //AVLTree nodeTree = new AVLTree();
+                DecartTree nodeTree = new DecartTree();
 
                 Utils.PrintArray("Insertions", inserts);
                 for (int i = 0; i < inserts.Length; ++i)
@@ -262,6 +263,7 @@ namespace lesson._09.cs
             Tester tester = new Tester("Trees");
             tester.Add(new SimpleTree());
             tester.Add(new AVLTree());
+            tester.Add(new DecartTree());
             tester.Add(new RandomTestCase(100));
             tester.Add(new OrderedTestCase(100, false));
             tester.Add(new OrderedTestCase(100, true));
