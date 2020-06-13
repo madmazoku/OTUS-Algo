@@ -1,0 +1,90 @@
+﻿Trees
+        TestCase: Random.10^1
+                              Simple [ 0.0047769]: insert:  0.0004606; find:   6.66e-05; remove:  0.0001642;
+                                 AVL [  0.004902]: insert:  0.0009082; find:  0.0001963; remove:  0.0002908;
+                              Decart [ 0.0047287]: insert:  0.0007614; find:  0.0002262; remove:  0.0001138;
+        TestCase: Ordered.10^1
+                              Simple [  0.000193]: insert:    1.4e-06; find:      6e-07; remove:    1.1e-06;
+                                 AVL [ 0.0004962]: insert:    3.5e-06; find:      7e-07; remove:  0.0001948;
+                              Decart [ 0.0002848]: insert:      3e-06; find:      6e-07; remove:    1.3e-06;
+        TestCase: Reversed.10^1
+                              Simple [   4.9e-05]: insert:    1.3e-06; find:      5e-07; remove:      8e-07;
+                                 AVL [  4.05e-05]: insert:    2.1e-06; find:      5e-07; remove:    1.4e-06;
+                              Decart [  1.09e-05]: insert:    3.9e-06; find:      6e-07; remove:      1e-06;
+        TestCase: Random.10^2
+                              Simple [  9.09e-05]: insert:    9.5e-06; find:    1.4e-06; remove:    1.5e-06;
+                                 AVL [  6.13e-05]: insert:   3.78e-05; find:    1.1e-06; remove:    3.2e-06;
+                              Decart [  9.06e-05]: insert:   6.28e-05; find:    1.7e-06; remove:    3.2e-06;
+        TestCase: Ordered.10^2
+                              Simple [  7.51e-05]: insert:   1.23e-05; find:    2.1e-06; remove:    2.9e-06;
+                                 AVL [  5.14e-05]: insert:    2.3e-05; find:    1.3e-06; remove:    3.4e-06;
+                              Decart [  5.88e-05]: insert:   2.86e-05; find:    1.2e-06; remove:    5.5e-06;
+        TestCase: Reversed.10^2
+                              Simple [ 0.0001542]: insert:   1.83e-05; find:    2.8e-06; remove:    5.2e-06;
+                                 AVL [ 0.0001291]: insert:   3.38e-05; find:    1.9e-06; remove:    9.5e-06;
+                              Decart [  9.59e-05]: insert:   4.69e-05; find:    2.9e-06; remove:    8.4e-06;
+        TestCase: Random.10^3
+                              Simple [ 0.0007255]: insert:  0.0001076; find:   1.44e-05; remove:   1.55e-05;
+                                 AVL [ 0.0006012]: insert:  0.0003726; find:   1.58e-05; remove:    3.7e-05;
+                              Decart [ 0.0009397]: insert:  0.0007409; find:   1.12e-05; remove:   4.55e-05;
+        TestCase: Ordered.10^3
+                              Simple [ 0.0025694]: insert:  0.0015145; find:  0.0001713; remove:  0.0001857;
+                                 AVL [ 0.0007347]: insert:   0.000466; find:   1.51e-05; remove:   4.28e-05;
+                              Decart [ 0.0006009]: insert:  0.0003814; find:   1.18e-05; remove:   4.62e-05;
+        TestCase: Reversed.10^3
+                              Simple [ 0.0022353]: insert:  0.0011965; find:  0.0001196; remove:  0.0001831;
+                                 AVL [ 0.0006125]: insert:  0.0003797; find:   1.34e-05; remove:   3.91e-05;
+                              Decart [ 0.0007738]: insert:  0.0005125; find:    1.5e-05; remove:   6.33e-05;
+        TestCase: Random.10^4
+                              Simple [ 0.0171066]: insert:  0.0046451; find:  0.0019576; remove:   0.000627;
+                                 AVL [ 0.0145351]: insert:  0.0095005; find:   0.000504; remove:  0.0013445;
+                              Decart [ 0.0224063]: insert:  0.0176512; find:  0.0005462; remove:  0.0013345;
+        TestCase: Ordered.10^4
+                              Simple [ 0.1499292]: insert:  0.1105119; find:  0.0117837; remove:  0.0219252;
+                                 AVL [ 0.0104472]: insert:  0.0063975; find:   0.000382; remove:  0.0004174;
+                              Decart [ 0.0108597]: insert:  0.0060293; find:     0.0005; remove:  0.0009913;
+        TestCase: Reversed.10^4
+                              Simple [  0.173538]: insert:  0.1307457; find:  0.0127115; remove:  0.0261759;
+                                 AVL [ 0.0114152]: insert:  0.0054955; find:  0.0002494; remove:  0.0005145;
+                              Decart [ 0.0224174]: insert:  0.0195076; find:  0.0003105; remove:  0.0009041;
+        TestCase: Random.10^5
+                              Simple [ 0.2234867]: insert:   0.080534; find:  0.0040736; remove:  0.0064648;
+                                 AVL [ 0.2630512]: insert:   0.192479; find:  0.0050813; remove:  0.0144936;
+                              Decart [ 0.3049311]: insert:   0.226555; find:  0.0047179; remove:  0.0136819;
+        TestCase: Ordered.10^5
+                              Simple [ 15.567673]: insert:  12.014739; find:  1.1798686; remove:  2.3502993;
+                                 AVL [ 0.0912936]: insert:  0.0505375; find:  0.0032927; remove:  0.0072051;
+                              Decart [ 0.0881148]: insert:  0.0315866; find:  0.0219489; remove:  0.0094646;
+        TestCase: Reversed.10^5
+                              Simple [ 14.803948]: insert:  11.403986; find:  1.0998333; remove:  2.2694508;
+                                 AVL [ 0.0757085]: insert:   0.032016; find:    0.00503; remove:  0.0062951;
+                              Decart [ 0.0784961]: insert:  0.0320922; find:  0.0059183; remove:  0.0101719;
+        TestCase: Random.10^6
+                              Simple [ 2.6625651]: insert:  1.3110767; find:   0.144215; remove:  0.2262867;
+                                 AVL [ 3.1428112]: insert:  2.1257422; find:   0.085356; remove:  0.1854933;
+                              Decart [ 3.9913673]: insert:  2.9690182; find:  0.1081356; remove:  0.1797266;
+        TestCase: Ordered.10^6
+                              Simple [ 300.01204]:Timeout
+                                 AVL [ 1.0235525]: insert:  0.6229474; find:  0.0728153; remove:  0.1298015;
+                              Decart [ 0.9623275]: insert:  0.4539316; find:  0.0937364; remove:  0.1651776;
+        TestCase: Reversed.10^6
+                              Simple [ 300.00658]:Timeout
+                                 AVL [ 0.9345819]: insert:   0.510917; find:  0.0738967; remove:  0.1238383;
+                              Decart [ 0.9260084]: insert:   0.456142; find:  0.0815335; remove:  0.1635478;
+        TestCase: Random.10^7
+                              Simple [ 70.545004]: insert:  38.523978; find:  3.8228705; remove:  3.8276752;
+                                 AVL [ 76.448699]: insert:  53.747728; find:  2.4651479; remove:  3.2815232;
+                              Decart [ 86.393481]: insert:  69.249027; find:   2.676056; remove:  3.6013785;
+        TestCase: Ordered.10^7
+                              Simple [ 300.01783]:Timeout
+                                 AVL [ 15.300235]: insert:  7.0783077; find:  1.5743758; remove:   2.544831;
+                              Decart [ 15.870292]: insert:  6.4696141; find:  2.0783225; remove:  3.0971167;
+        TestCase: Reversed.10^7
+                              Simple [ 300.00566]:Timeout
+                                 AVL [ 13.749461]: insert:  6.0138834; find:  1.6281476; remove:  2.9060715;
+                              Decart [ 13.967188]: insert:  5.1816263; find:   2.137938; remove:  3.3647029;
+        TestCase: Random.10^8
+                              Simple [ 300.51961]:Timeout
+                                 AVL [ 300.51931]:Timeout
+                              Decart [ 300.51582]:Timeout
+

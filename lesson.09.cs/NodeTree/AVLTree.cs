@@ -16,13 +16,56 @@ namespace lesson._09.cs
             public Node left;
             public Node right;
 
+            public int Balance
+            {
+                get
+                {
+                    int balance = 0;
+                    if (right != null) balance += right.levels;
+                    if (left != null) balance -= left.levels;
+                    return balance;
+                }
+            }
+
             public Node(int x)
             {
                 this.x = x;
+                UpdateLevels();
+            }
+
+            public void UpdateLevels()
+            {
+                levels = 0;
+                if (left != null && levels < left.levels)
+                    levels = left.levels;
+                if (right != null && levels < right.levels)
+                    levels = right.levels;
+                ++levels;
             }
         };
 
-        Node root;
+int BalanceFromNode(Node node)
+{
+    if (node == null) return 0;
+
+    int balance = 0;
+    if (node.right != null) balance += node.right.levels;
+    if (node.left != null) balance -= node.left.levels;
+    return balance;
+}
+
+int LevelsFromNodeChilds(Node node)
+{
+    int levels = 0;
+    if (node.left != null && levels < node.left.levels)
+        levels = node.left.levels;
+    if (node.right != null && levels < node.right.levels)
+        levels = node.right.levels;
+    return levels + 1;
+}
+
+
+Node root;
 
         public AVLTree() { root = null;  }
 
@@ -43,13 +86,9 @@ namespace lesson._09.cs
             return new AVLTree(CloneNode(root));
         }
 
-        // Base functions
         public void Insert(int x)
         {
-            Node node = new Node(x);
-            node.levels = LevelsFromNodeChilds(node);
-
-            root = InsertNode(root, node);
+            root = InsertNode(root, new Node(x));
         }
         public bool Find(int x)
         {
@@ -66,8 +105,8 @@ namespace lesson._09.cs
             node.right = anotherNode.left;
             anotherNode.left = node;
 
-            node.levels = LevelsFromNodeChilds(node);
-            anotherNode.levels = LevelsFromNodeChilds(anotherNode);
+            node.UpdateLevels();
+            anotherNode.UpdateLevels();
 
             return anotherNode;
         }
@@ -77,8 +116,8 @@ namespace lesson._09.cs
             node.left = anotherNode.right;
             anotherNode.right = node;
 
-            node.levels = LevelsFromNodeChilds(node);
-            anotherNode.levels = LevelsFromNodeChilds(anotherNode);
+            node.UpdateLevels();
+            anotherNode.UpdateLevels();
 
             return anotherNode;
         }
@@ -93,9 +132,6 @@ namespace lesson._09.cs
             return SmallRightRotate(node);
         }
 
-        // Additional functions
-
-        // Utility functions
         Node InsertNode(Node parent, Node node)
         {
             if(parent== null)
@@ -114,43 +150,22 @@ namespace lesson._09.cs
 
         Node RebalanceNode(Node node)
         {
-            node.levels = LevelsFromNodeChilds(node);
-
-            int balance = BalanceFromNode(node);
+            node.UpdateLevels();
+            int balance = node.Balance;
 
             if (balance== 2)
-                if (BalanceFromNode(node.right) < 0)
+                if (node.right.Balance < 0)
                     return BigLeftRotate(node);
                 else
                     return SmallLeftRotate(node);
 
             if (balance== -2)
-                if (BalanceFromNode(node.left) > 0)
+                if (node.left.Balance > 0)
                     return BigRightRotate(node);
                 else
                     return SmallRightRotate(node);
 
             return node;
-        }
-
-        int BalanceFromNode(Node node)
-        {
-            if (node == null) return 0;
-
-            int balance = 0;
-            if (node.right != null) balance += node.right.levels;
-            if (node.left != null) balance -= node.left.levels;
-            return balance;
-        }
-
-        int LevelsFromNodeChilds(Node node)
-        {
-            int levels = 0;
-            if (node.left != null && levels < node.left.levels)
-                levels = node.left.levels;
-            if (node.right != null && levels < node.right.levels)
-                levels = node.right.levels;
-            return levels + 1;
         }
 
         Node FindNode(Node node, int x)
@@ -216,7 +231,7 @@ namespace lesson._09.cs
             Node newNode = new Node(node.x);
             newNode.left = CloneNode(node.left);
             newNode.right= CloneNode(node.right);
-            newNode.levels = LevelsFromNodeChilds(newNode);
+            newNode.UpdateLevels();
 
             return newNode;
         }
