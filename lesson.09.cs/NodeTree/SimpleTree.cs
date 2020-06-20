@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace lesson._09.cs
 {
@@ -42,11 +41,12 @@ namespace lesson._09.cs
                 (Node node, bool left) = stack.Pop();
                 if (node == null)
                     continue;
-                if(left)
+                if (left)
                 {
                     stack.Push((node, false));
                     stack.Push((node.left, true));
-                } else
+                }
+                else
                 {
                     list.Add(node.x);
                     stack.Push((node.right, true));

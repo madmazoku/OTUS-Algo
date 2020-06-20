@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.Xml;
+﻿using System.Collections.Generic;
 
 namespace lesson._09.cs
 {
@@ -44,30 +40,30 @@ namespace lesson._09.cs
             }
         };
 
-int BalanceFromNode(Node node)
-{
-    if (node == null) return 0;
+        int BalanceFromNode(Node node)
+        {
+            if (node == null) return 0;
 
-    int balance = 0;
-    if (node.right != null) balance += node.right.levels;
-    if (node.left != null) balance -= node.left.levels;
-    return balance;
-}
+            int balance = 0;
+            if (node.right != null) balance += node.right.levels;
+            if (node.left != null) balance -= node.left.levels;
+            return balance;
+        }
 
-int LevelsFromNodeChilds(Node node)
-{
-    int levels = 0;
-    if (node.left != null && levels < node.left.levels)
-        levels = node.left.levels;
-    if (node.right != null && levels < node.right.levels)
-        levels = node.right.levels;
-    return levels + 1;
-}
+        int LevelsFromNodeChilds(Node node)
+        {
+            int levels = 0;
+            if (node.left != null && levels < node.left.levels)
+                levels = node.left.levels;
+            if (node.right != null && levels < node.right.levels)
+                levels = node.right.levels;
+            return levels + 1;
+        }
 
 
-Node root;
+        Node root;
 
-        public AVLTree() { root = null;  }
+        public AVLTree() { root = null; }
 
         AVLTree(Node root) { this.root = root; }
 
@@ -134,7 +130,7 @@ Node root;
 
         Node InsertNode(Node parent, Node node)
         {
-            if(parent== null)
+            if (parent == null)
                 return node;
 
             if (node == null || node.x == parent.x)
@@ -153,13 +149,13 @@ Node root;
             node.UpdateLevels();
             int balance = node.Balance;
 
-            if (balance== 2)
+            if (balance == 2)
                 if (node.right.Balance < 0)
                     return BigLeftRotate(node);
                 else
                     return SmallLeftRotate(node);
 
-            if (balance== -2)
+            if (balance == -2)
                 if (node.left.Balance > 0)
                     return BigRightRotate(node);
                 else
@@ -230,7 +226,7 @@ Node root;
 
             Node newNode = new Node(node.x);
             newNode.left = CloneNode(node.left);
-            newNode.right= CloneNode(node.right);
+            newNode.right = CloneNode(node.right);
             newNode.UpdateLevels();
 
             return newNode;

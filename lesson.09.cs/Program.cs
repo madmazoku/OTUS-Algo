@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace lesson._09.cs
+﻿namespace lesson._09.cs
 {
     class Program
     {

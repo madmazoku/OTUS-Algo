@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace lesson._09.cs
 {
@@ -24,19 +23,21 @@ namespace lesson._09.cs
         Random rand;
         Node root;
 
-        public DecartTree() { 
+        public DecartTree()
+        {
             root = null;
             rand = new Random();
         }
 
-        DecartTree(Node root, Random rand) { 
+        DecartTree(Node root, Random rand)
+        {
             this.root = root;
             this.rand = rand;
         }
 
-        public string Name() 
-        { 
-            return "Decart"; 
+        public string Name()
+        {
+            return "Decart";
         }
         public int[] GetArray()
         {
@@ -81,15 +82,17 @@ namespace lesson._09.cs
 
             Node equalNode;
             Node anotherNode;
-            if(x < node.x)
+            if (x < node.x)
             {
                 (anotherNode, node.left, equalNode) = SplitNode(node.left, x);
                 return (anotherNode, node, equalNode);
-            } else if(x > node.x)
+            }
+            else if (x > node.x)
             {
                 (node.right, anotherNode, equalNode) = SplitNode(node.right, x);
                 return (node, anotherNode, equalNode);
-            } else
+            }
+            else
             {
                 Node leftNode = node.left;
                 Node rightNode = node.right;
@@ -107,11 +110,12 @@ namespace lesson._09.cs
             if (rightNode == null)
                 return leftNode;
 
-            if(leftNode.y > rightNode.y)
+            if (leftNode.y > rightNode.y)
             {
                 leftNode.right = MergeNode(leftNode.right, rightNode);
                 return leftNode;
-            } else
+            }
+            else
             {
                 rightNode.left = MergeNode(leftNode, rightNode.left);
                 return rightNode;
