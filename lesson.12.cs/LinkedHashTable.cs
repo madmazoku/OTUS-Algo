@@ -62,7 +62,7 @@ namespace lesson._12.cs
                 node = ref node.next;
             }
 
-            node = new Node(key, value, node);
+            node = new Node(key, value, null);
             SizeIncrement();
             return null;
         }
