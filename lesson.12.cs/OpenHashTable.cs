@@ -33,7 +33,7 @@ namespace lesson._12.cs
         {
             UInt16 hash = (UInt16)(0xaaaa ^ range);
             foreach (char c in key)
-                hash = (UInt16)(((hash >> 4) | (hash << 12)) ^ c);
+                hash = (UInt16)((((hash >> 4) & 0xff) | (hash << 12)) ^ c);
             return hash % range;
         }
 
