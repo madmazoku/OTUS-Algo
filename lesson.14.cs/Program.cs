@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace lessong._13.cs
+namespace lesson._14.cs
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Hash functions");
         }
     }
 }
