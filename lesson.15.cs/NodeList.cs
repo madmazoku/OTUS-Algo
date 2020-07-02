@@ -129,6 +129,27 @@ namespace lesson._15.cs
             (Head, Tail) = (Tail, Head);
         }
 
+        public void Clear()
+        {
+            Head = Tail = null;
+            Size = 0;
+        }
+
+        public NodeList<T> Clone()
+        {
+            NodeList<T> nodeList = new NodeList<T>();
+            for (Node node = Head; node != null; node = node.Next)
+                nodeList.InsertLast(node.Value);
+            return nodeList;
+        }
+
+        public void ReplaceWith(NodeList<T> nodeList)
+        {
+            Clear();
+            for (Node node = nodeList.Head; node != null; node = node.Next)
+                InsertLast(node.Value);
+        }
+
         // Enumerations
         public NodeEnumerable Nodes { get { return new NodeEnumerable(this); } }
         public ValueEnumerable Values { get { return new ValueEnumerable(this); } }

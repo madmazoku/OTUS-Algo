@@ -11,41 +11,7 @@ namespace lesson._15.cs
             this.adjacenceArray = adjacenceArray;
         }
 
-        public NodeList<int> DSF_recursive(int from, Func<NodeList<int>, bool> predicat)
-        {
-            if (from < 0 || from >= adjacenceArray.Length)
-                throw new IndexOutOfRangeException();
-
-            bool[] used = new bool[adjacenceArray.Length];
-            NodeList<int> path = new NodeList<int>();
-
-            used[from] = true;
-            path.InsertLast(from);
-
-            if (!DSF_recursive(used, path, predicat))
-                path.RemoveLast();
-
-            return path;
-        }
-
-        bool DSF_recursive(bool[] used, NodeList<int> path, Func<NodeList<int>, bool> predicat)
-        {
-            int[] adjacence = adjacenceArray[path.Tail.Value];
-            foreach (int node in adjacence)
-            {
-                if (used[node])
-                    continue;
-                path.InsertLast(node);
-                used[node] = true;
-                if (predicat(path) || DSF_recursive(used, path, predicat))
-                    return true;
-                used[node] = false;
-                path.RemoveLast();
-            }
-            return false;
-        }
-
-        public NodeList<int> DSF_iterative(int from, Func<NodeList<int>, bool> predicat)
+        public NodeList<int> DFS(int from, Func<NodeList<int>, bool> predicat)
         {
             if (from < 0 || from >= adjacenceArray.Length)
                 throw new IndexOutOfRangeException();
@@ -62,16 +28,16 @@ namespace lesson._15.cs
                 if (predicat(path))
                     break;
             }
-            while (DSF_next(used, path, incident));
+            while (DFS_next(used, path, incident));
 
             return path;
         }
 
-        public bool DSF_next(bool[] used, NodeList<int> path, NodeList<int> incident)
+        bool DFS_next(bool[] used, NodeList<int> path, NodeList<int> incident)
         {
             while (incident.Size > 0)
             {
-                bool isLoop = path.Size > 1 && path.Tail.Value == path.Head.Value; 
+                bool isLoop = path.Size > 1 && path.Tail.Value == path.Head.Value;
                 bool isNoIncedentLeft = incident.Tail.Value == adjacenceArray[path.Tail.Value].Length;
                 if (isLoop || isNoIncedentLeft)
                 {
@@ -93,6 +59,52 @@ namespace lesson._15.cs
                 }
             }
             return false;
+        }
+
+        public NodeList<int> BFS(int from, Func<NodeList<int>, bool> predicat)
+        {
+            if (from < 0 || from >= adjacenceArray.Length)
+                throw new IndexOutOfRangeException();
+
+            NodeList<NodeList<int>> queue = new NodeList<NodeList<int>>();
+            bool[] used = new bool[adjacenceArray.Length];
+
+            queue.InsertLast(new NodeList<int>());
+            queue.Tail.Value.InsertLast(from);
+
+            do
+            {
+                if (predicat(queue.Tail.Value))
+                    break;
+            }
+            while (BFS_next(used, queue));
+
+            return queue.Size > 0 ? queue.Tail.Value : new NodeList<int>();
+        }
+
+        bool BFS_next(bool[] used, NodeList<NodeList<int>> queue)
+        {
+            NodeList<int> path = queue.RemoveLast().Value;
+            bool isLoop = path.Size > 1 && path.Tail.Value == path.Head.Value;
+            if (isLoop)
+                return queue.Size > 0;
+
+            Array.Clear(used, 0, used.Length);
+            foreach (int node in path.Values)
+                used[node] = true;
+            used[path.Head.Value] = false;
+
+            foreach (int node in adjacenceArray[path.Tail.Value])
+            {
+                bool isDegenerativeLoop = node == path.Head.Value && path.Size == 2;
+                if (!(used[node] || isDegenerativeLoop))
+                {
+                    queue.InsertFirst(path.Clone());
+                    queue.Head.Value.InsertLast(node);
+                }
+            }
+
+            return queue.Size > 0;
         }
     }
 }

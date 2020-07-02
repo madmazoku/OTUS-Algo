@@ -5,15 +5,16 @@ namespace lesson._15.cs
 {
     class Program
     {
-        static int[] MinDSFPath(Graph g, int from, int to)
+        static int[] MinSFPath(Graph g, int from, int to)
         {
             int[] minPath = null;
-            Func<NodeList<int>, bool> collectorPredicat = (path) => {
+            Func<NodeList<int>, bool> collectorPredicat = (path) =>
+            {
                 if (path.Size > 1 && path.Tail.Value == to && (minPath == null || minPath.Length > path.Size))
                     minPath = path.Values.ToArray();
                 return false;
             };
-            g.DSF_iterative(from, collectorPredicat);
+            g.BFS(from, collectorPredicat);
             return minPath;
         }
 
@@ -44,7 +45,7 @@ namespace lesson._15.cs
             Console.WriteLine("Iterate pathes:");
             int pathCount = 0;
 
-            g.DSF_iterative(0, (path) =>
+            g.BFS(0, (path) =>
             {
                 Console.Write($"[{pathCount++,3}]:");
                 foreach (int node in path.Values)
@@ -53,7 +54,7 @@ namespace lesson._15.cs
                 if (path.Tail.Value == 0)
                 {
                     int[] newPath = path.Values.ToArray();
-                    pathes.InsertIf(newPath, (x,y) => { return x.Length > y.Length; });
+                    pathes.InsertIf(newPath, (x, y) => { return x.Length > y.Length; });
                 }
                 return false;
             });
@@ -74,7 +75,7 @@ namespace lesson._15.cs
                 for (int j = 0; j < array.Length; ++j)
                 {
                     Console.Write($"[{i,3} => {j,-3}]:");
-                    int[] path = MinDSFPath(g, i, j);
+                    int[] path = MinSFPath(g, i, j);
                     if (path != null)
                         foreach (int node in path)
                             Console.Write($" {node};");
