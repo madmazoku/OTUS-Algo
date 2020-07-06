@@ -1,23 +1,37 @@
-﻿namespace lesson._16.cs
+﻿using System.ComponentModel.Design.Serialization;
+using System.Drawing;
+
+namespace lesson._16.cs
 {
     class NodeQueue<T>
     {
         public int size;
-        public Node<T> root;
+        public Node<T> first;
         public Node<T> last;
+
+        public T First { get { return first.value; } set { first.value = value; } }
+        public T Last { get { return last.value; } set { last.value = value; } }
+
+        public Node<T> Detach()
+        {
+            Node<T> root = first;
+            first = last = null;
+            size = 0;
+            return root;
+        }
 
         public NodeQueue()
         {
             size = 0;
-            last = root = null;
+            last = first = null;
         }
 
-        public NodeQueue(Node<T> root)
+        public NodeQueue(Node<T> first)
         {
-            this.root = root;
+            this.first = first;
             last = null;
             size = 0;
-            for (Node<T> node = root; node != null; last = node, node = node.next)
+            for (Node<T> node = first; node != null; last = node, node = node.next)
                 ++size;
         }
 
@@ -25,7 +39,7 @@
         {
             Node<T> node = new Node<T>(value, null);
             if (last == null)
-                root = last = node;
+                first = last = node;
             else
                 last = last.next = node;
             ++size;
@@ -33,9 +47,9 @@
 
         public T Deque()
         {
-            Node<T> node = root;
-            root = root.next;
-            if (root == null)
+            Node<T> node = first;
+            first = first.next;
+            if (first == null)
                 last = null;
             --size;
             return node.value;

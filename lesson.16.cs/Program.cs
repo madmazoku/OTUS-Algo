@@ -36,6 +36,8 @@ namespace lesson._16.cs
             int[][] grantDatagramm = graph.Demucron();
             Console.WriteLine("Grant's datagramm");
             Util.Print(grantDatagramm);
+
+            Console.WriteLine("");
         }
 
         //static void TestTarjan()
@@ -132,19 +134,71 @@ namespace lesson._16.cs
 
             Graph graph = new Graph(adjancenceVector);
 
-            int[][] strongConnectedRecursive = graph.TarjanRecursive();
-            Console.WriteLine("Strong Connected Nodes (recursive)");
-            Util.Print(strongConnectedRecursive);
-
             int[][] strongConnectedIterative = graph.Tarjan();
             Console.WriteLine("Strong Connected Nodes (iterative)");
             Util.Print(strongConnectedIterative);
+
+            Tarjan tarjan = new Tarjan(graph);
+            Console.WriteLine("Strong Connected Nodes (recursive)");
+            Util.Print(tarjan.StrongConnected);
+
+            Console.WriteLine("");
+        }
+
+        static void TestArticulation()
+        {
+            AdjancenceVector adjancenceVector = new AdjancenceVector(new int[][] {
+                /*  0 */new int[] { 1, 2 },
+                /*  1 */new int[] { 0, 3 },
+                /*  2 */new int[] { 0, 3 },
+                /*  3 */new int[] { 1, 2, 4, 5},
+                /*  4 */new int[] { 3, 6 },
+                /*  5 */new int[] { 3, 6 },
+                /*  6 */new int[] { 4, 5 },
+            });
+            Console.WriteLine("adjancenceVector");
+            adjancenceVector.Print();
+
+            Graph graph = new Graph(adjancenceVector);
+
+            int[] articulationArray = graph.ArticulationNodes();
+            Console.WriteLine("Articulation nodes");
+            Util.Print(articulationArray);
+
+            Console.WriteLine("");
+        }
+
+        static void TestBridge()
+        {
+            // Bridge: 3 -> 4
+            AdjancenceVector adjancenceVector = new AdjancenceVector(new int[][] {
+                /*  0 */new int[] { 1, 2 },
+                /*  1 */new int[] { 0, 3 },
+                /*  2 */new int[] { 0, 3 },
+                /*  3 */new int[] { 1, 2, 4},
+                /*  4 */new int[] { 3, 5, 6 },
+                /*  5 */new int[] { 4, 7 },
+                /*  6 */new int[] { 4, 7 },
+                /*  7 */new int[] { 5, 6 },
+            });
+            Console.WriteLine("adjancenceVector");
+            adjancenceVector.Print();
+
+            Graph graph = new Graph(adjancenceVector);
+
+            (int, int)[] bridgeArray = graph.BridgeEdges(false);
+            Console.WriteLine("Bridge edges");
+            Util.Print(bridgeArray);
+
+            Console.WriteLine("");
         }
 
         static void Main(string[] args)
         {
-            // TestDemucron();
+            TestDemucron();
             TestTarjan();
+            TestArticulation();
+            TestBridge();
         }
     }
 }

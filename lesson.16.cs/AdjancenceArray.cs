@@ -51,7 +51,7 @@ namespace lesson._16.cs
             return new AdjancenceArray(adjancenceArray);
         }
 
-        public AdjancenceArray RemoveEdge(int from, int to)
+        public AdjancenceArray RemoveEdge(int from, int to, bool directed = true)
         {
             if (from < 0 || from >= data.Length)
                 throw new IndexOutOfRangeException();
@@ -61,6 +61,8 @@ namespace lesson._16.cs
             bool[,] adjancenceArray = new bool[data.GetLength(0), data.GetLength(1)];
             Array.Copy(data, adjancenceArray, data.Length);
             adjancenceArray[from, to] = false;
+            if(!directed)
+                adjancenceArray[to, from] = false;
 
             return new AdjancenceArray(adjancenceArray);
         }

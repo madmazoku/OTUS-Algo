@@ -30,21 +30,11 @@ namespace lesson._16.cs
             data = new int[adjancenceArray.NodesCount][];
             for (int node = 0; node < adjancenceArray.NodesCount; ++node)
             {
-                Node<int> root = null;
-                int adjancentNodes = 0;
+                NodeStack<int> stack = new NodeStack<int>();
                 for (int adjancentNode = 0; adjancentNode < adjancenceArray.NodesCount; ++adjancentNode)
                     if (adjancenceArray.Data[node, adjancentNode])
-                    {
-                        root = new Node<int>(adjancentNode, root);
-                        ++adjancentNodes;
-                    }
-                data[node] = new int[adjancentNodes];
-                while (adjancentNodes > 0)
-                {
-                    --adjancentNodes;
-                    data[node][adjancentNodes] = root.value;
-                    root = root.next;
-                }
+                        stack.Push(adjancentNode);
+                data[node] = Util.ListToArray(stack);
             }
         }
 
@@ -53,31 +43,29 @@ namespace lesson._16.cs
             if (node < 0 || node >= data.Length)
                 throw new IndexOutOfRangeException();
 
-            int countLevels = 0;
-            Node<Node<int>> rootLevel = null;
-            Node<int> rootLevelSize = null;
+            NodeStack<NodeStack<int>> skewStack = new NodeStack<NodeStack<int>>();
 
             for (int anotherNode = 0; anotherNode < data.Length; ++anotherNode)
                 if (anotherNode != node)
                 {
-                    ++countLevels;
-                    rootLevel = new Node<Node<int>>(null, rootLevel);
-                    rootLevelSize = new Node<int>(0, rootLevelSize);
+                    skewStack.Push(new NodeStack<int>());
 
                     int[] adjancentNodes = data[anotherNode];
                     for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
-                        if (adjancentNodes[incendence] != node)
-                        {
-                            rootLevel.value = new Node<int>(adjancentNodes[incendence], rootLevel.value);
-                            ++rootLevelSize.value;
-                        }
+                    {
+                        int adjancentNode = adjancentNodes[incendence];
+                        if (adjancentNode < node)
+                            skewStack.Top.Push(adjancentNode);
+                        else if (adjancentNode > node)
+                            skewStack.Top.Push(adjancentNode - 1);
+                    }
 
                 }
 
-            return new AdjancenceVector(Util.SkewListToArray<int>(countLevels, rootLevel, rootLevelSize));
+            return new AdjancenceVector(Util.SkewListToArray(skewStack));
         }
 
-        public AdjancenceVector RemoveEdge(int from, int to)
+        public AdjancenceVector RemoveEdge(int from, int to, bool directed = true)
         {
             if (from < 0 || from >= data.Length)
                 throw new IndexOutOfRangeException();
@@ -88,22 +76,21 @@ namespace lesson._16.cs
             for (int node = 0; node < data.Length; ++node)
             {
                 int[] adjancentNodes = data[node];
-                if (node != from)
+                if (node != from && (directed || node != to))
                 {
                     adjancenceVector[node] = new int[adjancentNodes.Length];
                     Array.Copy(adjancentNodes, adjancenceVector[node], adjancentNodes.Length);
                 }
                 else
                 {
-                    int countAdjanceNode = 0;
-                    Node<int> rootAdjanceNode = null;
+                    NodeStack<int> stack = new NodeStack<int>();
                     for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
-                        if (adjancentNodes[incendence] != to)
-                        {
-                            ++countAdjanceNode;
-                            rootAdjanceNode = new Node<int>(adjancentNodes[incendence], rootAdjanceNode);
-                        }
-                    adjancenceVector[node] = Util.ListToArray<int>(countAdjanceNode, rootAdjanceNode);
+                    {
+                        int adjancentNode = adjancentNodes[incendence];
+                        if (adjancentNode != to && (directed || adjancentNode != from))
+                            stack.Push(adjancentNode);
+                    }
+                    adjancenceVector[node] = Util.ListToArray<int>(stack);
                 }
             }
 

@@ -3,32 +3,42 @@
     class NodeStack<T>
     {
         public int size;
-        public Node<T> root;
+        public Node<T> top;
+
+        public T Top {  get { return top.value; } set { top.value = value; } }
+
+        public Node<T> Detach()
+        {
+            Node<T> root = top;
+            top = null;
+            size = 0;
+            return root;
+        }
 
         public NodeStack()
         {
             size = 0;
-            root = null;
+            top = null;
         }
 
-        public NodeStack(Node<T> root)
+        public NodeStack(Node<T> top)
         {
-            this.root = root;
+            this.top = top;
             size = 0;
-            for (Node<T> node = root; node != null; node = node.next)
+            for (Node<T> node = top; node != null; node = node.next)
                 ++size;
         }
 
         public void Push(T value)
         {
-            root = new Node<T>(value, root);
+            top = new Node<T>(value, top);
             ++size;
         }
 
         public T Pop()
         {
-            Node<T> node = root;
-            root = root.next;
+            Node<T> node = top;
+            top = top.next;
             --size;
             return node.value;
         }

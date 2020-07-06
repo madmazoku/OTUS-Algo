@@ -1,9 +1,27 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.CompilerServices;
+using System;
 
 namespace lesson._16.cs
 {
     class Util
     {
+        static public void Print((int, int)[] array)
+        {
+            if (array.Length == 0)
+                Console.WriteLine("Empty");
+            else
+            {
+                (int from, int to) = array[0];
+                Console.Write($"{from,2} -> {to,2}");
+                for (int y = 1; y < array.Length; ++y)
+                {
+                    (from, to) = array[y];
+                    Console.Write($"; {from,2} -> {to,2}");
+                }
+                Console.WriteLine("");
+            }
+        }
+
         static public void Print(int[] array)
         {
             if (array.Length == 0)
@@ -85,53 +103,49 @@ namespace lesson._16.cs
             Console.WriteLine("");
         }
 
-        static public T[][] SkewListToArray<T>(int countLevels, Node<Node<T>> rootLevel, Node<int> rootLevelSize)
+        static public T[][] SkewListToArray<T>(NodeStack<NodeStack<T>> skewStack)
         {
-            T[][] skewArray = new T[countLevels][];
-            while (countLevels > 0)
+            T[][] skewArray = new T[skewStack.size][];
+            while (skewStack.size > 0)
             {
-                --countLevels;
-
-                skewArray[countLevels] = new T[rootLevelSize.value];
-                while (rootLevelSize.value > 0)
-                {
-                    --rootLevelSize.value;
-                    skewArray[countLevels][rootLevelSize.value] = rootLevel.value.value;
-                    rootLevel.value = rootLevel.value.next;
-                }
-
-                rootLevel = rootLevel.next;
-                rootLevelSize = rootLevelSize.next;
+                NodeStack<T> stack = skewStack.Pop();
+                skewArray[skewStack.size] = Util.ListToArray<T>(stack);
             }
-
             return skewArray;
         }
 
-        static public T[] ListToArray<T>(int count, Node<T> root)
+        static public T[][] SkewListToArray<T>(NodeStack<NodeQueue<T>> skewStackQueue)
         {
-            T[] array = new T[count];
-            while (count > 0)
+            T[][] skewArray = new T[skewStackQueue.size][];
+            while (skewStackQueue.size > 0)
             {
-                array[--count] = root.value;
-                root = root.next;
+                NodeQueue<T> queue = skewStackQueue.Pop();
+                skewArray[skewStackQueue.size] = Util.ListToArray<T>(queue);
+            }
+            return skewArray;
+        }
+
+        static public T[] ListToArray<T>(NodeStack<T> stack)
+        {
+            T[] array = new T[stack.size];
+            while (stack.size > 0)
+            {
+                T value = stack.Pop();
+                array[stack.size] = value;
             }
             return array;
         }
 
-        static public void MoveNodeBetweenLists<T>(ref Node<T> from, ref Node<T> to)
+        static public T[] ListToArray<T>(NodeQueue<T> queue)
         {
-            Node<T> tmp = from;
-            from = from.next;
-            tmp.next = to;
-            to = tmp;
+            T[] array = new T[queue.size];
+            while (queue.size > 0)
+            {
+                T value = queue.Deque();
+                array[queue.size] = value;
+            }
+            return array;
         }
 
-        static public void ReverseList<T>(ref Node<T> node)
-        {
-            Node<T> reverseNode = null;
-            while (node != null)
-                MoveNodeBetweenLists<T>(ref node, ref reverseNode);
-            node = reverseNode;
-        }
     }
 }
