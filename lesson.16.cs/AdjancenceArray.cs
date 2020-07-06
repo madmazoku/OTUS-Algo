@@ -45,7 +45,7 @@ namespace lesson._16.cs
                             adjancenceArray[anotherNode - offsetNode, adjancentNode - offsetAdjancentNode] = data[anotherNode, adjancentNode];
                         else
                             offsetAdjancentNode = 1;
-                 else 
+                else
                     offsetNode = 1;
 
             return new AdjancenceArray(adjancenceArray);

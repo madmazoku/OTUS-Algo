@@ -85,7 +85,8 @@ namespace lesson._16.cs
                 throw new IndexOutOfRangeException();
 
             int[][] adjancenceVector = new int[data.Length][];
-            for (int node = 0; node < data.Length; ++node) { 
+            for (int node = 0; node < data.Length; ++node)
+            {
                 int[] adjancentNodes = data[node];
                 if (node != from)
                 {

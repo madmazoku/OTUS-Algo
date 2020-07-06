@@ -8,7 +8,8 @@ namespace lesson._16.cs
         {
             if (array.Length == 0)
                 Console.WriteLine("Empty");
-            else {
+            else
+            {
                 Console.Write($"{array[0],2}");
                 for (int y = 1; y < array.Length; ++y)
                     Console.Write($"; {array[y],2}");
@@ -109,7 +110,7 @@ namespace lesson._16.cs
         static public T[] ListToArray<T>(int count, Node<T> root)
         {
             T[] array = new T[count];
-            while(count > 0)
+            while (count > 0)
             {
                 array[--count] = root.value;
                 root = root.next;
