@@ -196,6 +196,10 @@ namespace lesson._16.cs
             public int incendence;
             public int min;
 
+            public TarjanFrame(int node)
+            {
+                this.node = node;
+            }
             public TarjanFrame(int node, int incendence, int min)
             {
                 this.node = node;
@@ -215,6 +219,8 @@ namespace lesson._16.cs
             Console.WriteLine();
         }
 
+        
+
         public int[][] Tarjan()
         {
             int[] pre = new int[Data.NodesCount];
@@ -226,56 +232,60 @@ namespace lesson._16.cs
             
             Array.Fill(pre, -1);
 
-            for (int initialNode = 0; initialNode < Data.NodesCount; ++initialNode) { 
+            for (int initialNode = 0; initialNode < Data.NodesCount; ++initialNode)
+            {
                 if (pre[initialNode] != -1)
                     continue;
 
-                stack = new Node<int>(initialNode, stack);
-                pre[initialNode] = low[initialNode] = cnt;
-                Node<TarjanFrame> rootFrame = new Node<TarjanFrame>(new TarjanFrame(initialNode, Data.Data[initialNode].Length, cnt), null);
-                ++cnt;
+                Node<TarjanFrame> rootFrame = new Node<TarjanFrame>(new TarjanFrame(initialNode), null);
+                rootFrame.value.incendence = Data.Data[rootFrame.value.node].Length;
+                rootFrame.value.min = pre[rootFrame.value.node] = low[rootFrame.value.node] = cnt++;
+                stack = new Node<int>(rootFrame.value.node, stack);
 
                 while(rootFrame != null)
                 {
-                    while (rootFrame.value.incendence > 0)
+                    while(rootFrame.value.incendence > 0)
                     {
                         --rootFrame.value.incendence;
                         int adjancentNode = Data.Data[rootFrame.value.node][rootFrame.value.incendence];
-                        if(pre[adjancentNode] == -1)
+                        if (pre[adjancentNode] == -1)
                         {
-                            stack = new Node<int>(adjancentNode, stack);
-                            pre[adjancentNode] = low[adjancentNode] = cnt;
-                            rootFrame = new Node<TarjanFrame>(new TarjanFrame(adjancentNode, Data.Data[adjancentNode].Length, cnt), rootFrame);
-                            ++cnt;
+                            rootFrame = new Node<TarjanFrame>(new TarjanFrame(adjancentNode), rootFrame);
+                            rootFrame.value.incendence = Data.Data[rootFrame.value.node].Length;
+                            rootFrame.value.min = pre[rootFrame.value.node] = low[rootFrame.value.node] = cnt++;
+                            stack = new Node<int>(rootFrame.value.node, stack);
                         } else
                         {
                             if (rootFrame.value.min > low[adjancentNode])
                                 rootFrame.value.min = low[adjancentNode];
                         }
                     }
-                    while (rootFrame != null && rootFrame.value.incendence == 0) {
+                    while (rootFrame != null && rootFrame.value.incendence == 0)
+                    {
                         if (low[rootFrame.value.node] > rootFrame.value.min)
                             low[rootFrame.value.node] = rootFrame.value.min;
                         else
                         {
-                            int resultNode;
+                            int node;
                             do
                             {
-                                resultNode = stack.value;
+                                node = stack.value;
                                 stack = stack.next;
-                                id[resultNode] = scnt;
-                                low[resultNode] = Data.NodesCount;
-                            } while (resultNode != rootFrame.value.node);
+                                id[node] = scnt;
+                                low[node] = Data.NodesCount;
+                            } while (node != rootFrame.value.node);
                             ++scnt;
                         }
-                        if(rootFrame.next != null)
-                        {
-                            if (rootFrame.next.value.min > low[rootFrame.value.node])
-                                rootFrame.next.value.min = low[rootFrame.value.node];
-                        }
                         rootFrame = rootFrame.next;
+                        if (rootFrame != null)
+                        {
+                            int adjancentNode = Data.Data[rootFrame.value.node][rootFrame.value.incendence];
+                            if (rootFrame.value.min > low[adjancentNode])
+                                rootFrame.value.min = low[adjancentNode];
+                        }
                     }
                 }
+
             }
 
             int[] countStrongConnectedArray = new int[scnt];
