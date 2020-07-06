@@ -190,118 +190,221 @@ namespace lesson._16.cs
             ++state.scnt;
         }
 
+        class TarjanFrame
+        {
+            public int node;
+            public int incendence;
+            public int min;
+
+            public TarjanFrame(int node, int incendence, int min)
+            {
+                this.node = node;
+                this.incendence = incendence;
+                this.min = min;
+            }
+        }
+
+        void PrintFrames(string text, Node<TarjanFrame> rootFrame)
+        {
+            Console.Write($"{text,25}:");
+            if (rootFrame == null)
+                Console.Write(" Empty;");
+            else
+                for ((Node<TarjanFrame> node, int index) = (rootFrame, 0); node != null; node = node.next, ++index)
+                    Console.Write($" {index,2}: (node: {node.value.node,2}; min: {node.value.min}; inc: {node.value.incendence});");
+            Console.WriteLine();
+        }
+
         public int[][] Tarjan()
         {
-            int blackNodesCount = 0;
-            NodeColors[] nodesColor = new NodeColors[Data.NodesCount];
-            int countNodeOrder = 0;
-            Node<int> rootNodeOrder = null;
+            int[] pre = new int[Data.NodesCount];
+            int[] low = new int[Data.NodesCount];
+            int[] id = new int[Data.NodesCount];
+            Node<int> stack = null;
+            int cnt = 0;
+            int scnt = 0;
+            
+            Array.Fill(pre, -1);
 
-            // topological sort
-            while (blackNodesCount < nodesColor.Length)
-            {
-                int countNodePath = 0;
-                Node<int> rootNodePath = null;
-                Node<int> incendencePath = null;
-                for (int node = 0; node < nodesColor.Length; ++node)
-                    if (nodesColor[node] == NodeColors.White)
-                    {
-                        nodesColor[node] = NodeColors.Gray;
-                        rootNodePath = new Node<int>(node, rootNodePath);
-                        incendencePath = new Node<int>(Data.Data[node].Length, incendencePath);
-                        ++countNodePath;
-                        break;
-                    }
+            for (int initialNode = 0; initialNode < Data.NodesCount; ++initialNode) { 
+                if (pre[initialNode] != -1)
+                    continue;
 
-                // DFS
-                while (rootNodePath != null)
+                stack = new Node<int>(initialNode, stack);
+                pre[initialNode] = low[initialNode] = cnt;
+                Node<TarjanFrame> rootFrame = new Node<TarjanFrame>(new TarjanFrame(initialNode, Data.Data[initialNode].Length, cnt), null);
+                ++cnt;
+
+                while(rootFrame != null)
                 {
-                    while (incendencePath.value > 0)
+                    while (rootFrame.value.incendence > 0)
                     {
-                        --incendencePath.value;
-                        int node = Data.Data[rootNodePath.value][incendencePath.value];
-                        if (nodesColor[node] == NodeColors.White)
+                        --rootFrame.value.incendence;
+                        int adjancentNode = Data.Data[rootFrame.value.node][rootFrame.value.incendence];
+                        if(pre[adjancentNode] == -1)
                         {
-                            nodesColor[node] = NodeColors.Gray;
-                            rootNodePath = new Node<int>(node, rootNodePath);
-                            incendencePath = new Node<int>(Data.Data[node].Length, incendencePath);
-                            ++countNodePath;
-                            break;
+                            stack = new Node<int>(adjancentNode, stack);
+                            pre[adjancentNode] = low[adjancentNode] = cnt;
+                            rootFrame = new Node<TarjanFrame>(new TarjanFrame(adjancentNode, Data.Data[adjancentNode].Length, cnt), rootFrame);
+                            ++cnt;
+                        } else
+                        {
+                            if (rootFrame.value.min > low[adjancentNode])
+                                rootFrame.value.min = low[adjancentNode];
                         }
                     }
-
-                    if (incendencePath.value > 0)
-                        continue;
-
-                    while (incendencePath != null && incendencePath.value == 0)
-                    {
-                        nodesColor[rootNodePath.value] = NodeColors.Black;
-                        ++blackNodesCount;
-
-                        Util.MoveNodeBetweenLists<int>(ref rootNodePath, ref rootNodeOrder);
-                        incendencePath = incendencePath.next;
-                        ++countNodeOrder;
-                        --countNodePath;
-                    }
-
-                }
-            }
-
-            Util.ReverseList<int>(ref rootNodeOrder);
-
-            int countLevels = 0;
-            Node<Node<int>> rootLevel = null;
-            Node<int> rootLevelSize = null;
-
-            // sub graphs extract
-            while (blackNodesCount > 0)
-            {
-                Node<int> nodePath = null;
-                Node<int> incendencePath = null;
-                while (nodesColor[rootNodeOrder.value] != NodeColors.Black)
-                    rootNodeOrder = rootNodeOrder.next;
-
-                ++countLevels;
-                rootLevel = new Node<Node<int>>(null, rootLevel);
-                rootLevelSize = new Node<int>(0, rootLevelSize);
-
-                nodesColor[rootNodeOrder.value] = NodeColors.Gray;
-                Util.MoveNodeBetweenLists<int>(ref rootNodeOrder, ref nodePath);
-                incendencePath = new Node<int>(Data.Data[nodePath.value].Length, incendencePath);
-
-                // DFS
-                while (nodePath != null)
-                {
-                    while (incendencePath.value > 0)
-                    {
-                        --incendencePath.value;
-                        int node = Data.Data[nodePath.value][incendencePath.value];
-                        if (nodesColor[node] == NodeColors.Black)
+                    while (rootFrame != null && rootFrame.value.incendence == 0) {
+                        if (low[rootFrame.value.node] > rootFrame.value.min)
+                            low[rootFrame.value.node] = rootFrame.value.min;
+                        else
                         {
-                            nodesColor[node] = NodeColors.Gray;
-                            nodePath = new Node<int>(node, nodePath);
-                            incendencePath = new Node<int>(Data.Data[node].Length, incendencePath);
-                            break;
+                            int resultNode;
+                            do
+                            {
+                                resultNode = stack.value;
+                                stack = stack.next;
+                                id[resultNode] = scnt;
+                                low[resultNode] = Data.NodesCount;
+                            } while (resultNode != rootFrame.value.node);
+                            ++scnt;
                         }
-                    }
-
-                    if (incendencePath.value > 0)
-                        continue;
-
-                    while (incendencePath != null && incendencePath.value == 0)
-                    {
-                        nodesColor[nodePath.value] = NodeColors.White;
-                        --blackNodesCount;
-
-                        Util.MoveNodeBetweenLists<int>(ref nodePath, ref rootLevel.value);
-                        incendencePath = incendencePath.next;
-                        ++rootLevelSize.value;
+                        if(rootFrame.next != null)
+                        {
+                            if (rootFrame.next.value.min > low[rootFrame.value.node])
+                                rootFrame.next.value.min = low[rootFrame.value.node];
+                        }
+                        rootFrame = rootFrame.next;
                     }
                 }
             }
 
-            return Util.SkewListToArray(countLevels, rootLevel, rootLevelSize);
+            int[] countStrongConnectedArray = new int[scnt];
+            Node<int>[] rootStrongConnectedArray = new Node<int>[scnt];
+            for (int node = 0; node < Data.NodesCount; ++node)
+            {
+                ++countStrongConnectedArray[id[node]];
+                rootStrongConnectedArray[id[node]] = new Node<int>(node, rootStrongConnectedArray[id[node]]);
+            }
+
+            int[][] strongConnected = new int[scnt][];
+            for (int sid = 0; sid < scnt; ++sid)
+                strongConnected[sid] = Util.ListToArray<int>(countStrongConnectedArray[sid], rootStrongConnectedArray[sid]);
+
+            return strongConnected;
         }
+
+        //public int[][] Tarjan()
+        //{
+        //    int blackNodesCount = 0;
+        //    NodeColors[] nodesColor = new NodeColors[Data.NodesCount];
+        //    int countNodeOrder = 0;
+        //    Node<int> rootNodeOrder = null;
+
+        //    // topological sort
+        //    while (blackNodesCount < nodesColor.Length)
+        //    {
+        //        int countNodePath = 0;
+        //        Node<int> rootNodePath = null;
+        //        Node<int> incendencePath = null;
+        //        for (int node = 0; node < nodesColor.Length; ++node)
+        //            if (nodesColor[node] == NodeColors.White)
+        //            {
+        //                nodesColor[node] = NodeColors.Gray;
+        //                rootNodePath = new Node<int>(node, rootNodePath);
+        //                incendencePath = new Node<int>(Data.Data[node].Length, incendencePath);
+        //                ++countNodePath;
+        //                break;
+        //            }
+
+        //        // DFS
+        //        while (rootNodePath != null)
+        //        {
+        //            while (incendencePath.value > 0)
+        //            {
+        //                --incendencePath.value;
+        //                int node = Data.Data[rootNodePath.value][incendencePath.value];
+        //                if (nodesColor[node] == NodeColors.White)
+        //                {
+        //                    nodesColor[node] = NodeColors.Gray;
+        //                    rootNodePath = new Node<int>(node, rootNodePath);
+        //                    incendencePath = new Node<int>(Data.Data[node].Length, incendencePath);
+        //                    ++countNodePath;
+        //                    break;
+        //                }
+        //            }
+
+        //            if (incendencePath.value > 0)
+        //                continue;
+
+        //            while (incendencePath != null && incendencePath.value == 0)
+        //            {
+        //                nodesColor[rootNodePath.value] = NodeColors.Black;
+        //                ++blackNodesCount;
+
+        //                Util.MoveNodeBetweenLists<int>(ref rootNodePath, ref rootNodeOrder);
+        //                incendencePath = incendencePath.next;
+        //                ++countNodeOrder;
+        //                --countNodePath;
+        //            }
+
+        //        }
+        //    }
+
+        //    Util.ReverseList<int>(ref rootNodeOrder);
+
+        //    int countLevels = 0;
+        //    Node<Node<int>> rootLevel = null;
+        //    Node<int> rootLevelSize = null;
+
+        //    // sub graphs extract
+        //    while (blackNodesCount > 0)
+        //    {
+        //        Node<int> nodePath = null;
+        //        Node<int> incendencePath = null;
+        //        while (nodesColor[rootNodeOrder.value] != NodeColors.Black)
+        //            rootNodeOrder = rootNodeOrder.next;
+
+        //        ++countLevels;
+        //        rootLevel = new Node<Node<int>>(null, rootLevel);
+        //        rootLevelSize = new Node<int>(0, rootLevelSize);
+
+        //        nodesColor[rootNodeOrder.value] = NodeColors.Gray;
+        //        Util.MoveNodeBetweenLists<int>(ref rootNodeOrder, ref nodePath);
+        //        incendencePath = new Node<int>(Data.Data[nodePath.value].Length, incendencePath);
+
+        //        // DFS
+        //        while (nodePath != null)
+        //        {
+        //            while (incendencePath.value > 0)
+        //            {
+        //                --incendencePath.value;
+        //                int node = Data.Data[nodePath.value][incendencePath.value];
+        //                if (nodesColor[node] == NodeColors.Black)
+        //                {
+        //                    nodesColor[node] = NodeColors.Gray;
+        //                    nodePath = new Node<int>(node, nodePath);
+        //                    incendencePath = new Node<int>(Data.Data[node].Length, incendencePath);
+        //                    break;
+        //                }
+        //            }
+
+        //            if (incendencePath.value > 0)
+        //                continue;
+
+        //            while (incendencePath != null && incendencePath.value == 0)
+        //            {
+        //                nodesColor[nodePath.value] = NodeColors.White;
+        //                --blackNodesCount;
+
+        //                Util.MoveNodeBetweenLists<int>(ref nodePath, ref rootLevel.value);
+        //                incendencePath = incendencePath.next;
+        //                ++rootLevelSize.value;
+        //            }
+        //        }
+        //    }
+
+        //    return Util.SkewListToArray(countLevels, rootLevel, rootLevelSize);
+        //}
 
         int[] ArticulationNodes()
         {

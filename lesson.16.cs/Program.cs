@@ -132,13 +132,13 @@ namespace lesson._16.cs
 
             Graph graph = new Graph(adjancenceVector);
 
-            int[][] strongConnectedIterative = graph.Tarjan();
-            Console.WriteLine("Strong Connected Nodes (iterative)");
-            Util.Print(strongConnectedIterative);
-
             int[][] strongConnectedRecursive = graph.TarjanRecursive();
             Console.WriteLine("Strong Connected Nodes (recursive)");
             Util.Print(strongConnectedRecursive);
+
+            int[][] strongConnectedIterative = graph.Tarjan();
+            Console.WriteLine("Strong Connected Nodes (iterative)");
+            Util.Print(strongConnectedIterative);
         }
 
         static void Main(string[] args)
