@@ -11,11 +11,11 @@ namespace lesson._16.cs
             else
             {
                 (int from, int to) = array[0];
-                Console.Write($"{from,2} -> {to,2}");
+                Console.Write($"{from,2} -> {to,-2}");
                 for (int y = 1; y < array.Length; ++y)
                 {
                     (from, to) = array[y];
-                    Console.Write($"; {from,2} -> {to,2}");
+                    Console.Write($"; {from,2} -> {to,-2}");
                 }
                 Console.WriteLine("");
             }
