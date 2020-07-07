@@ -54,22 +54,19 @@ namespace lesson._16.cs
             for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
             {
                 int adjancentNode = adjancentNodes[incendence];
-                if (adjancentNode != prevNode)
+                if (pre[adjancentNode] == -1)
                 {
-                    if (pre[adjancentNode] == -1)
-                    {
-                        DSF(adjancentNode, node);
-                        if (low[node] > low[adjancentNode])
-                            low[node] = low[adjancentNode];
+                    DSF(adjancentNode, node);
+                    if (low[node] > low[adjancentNode])
+                        low[node] = low[adjancentNode];
 
-                        ++count;
-                        if (max < low[adjancentNode])
-                            max = low[adjancentNode];
-                    }
-                    else if (low[node] > pre[adjancentNode])
-                        low[node] = pre[adjancentNode];
-
+                    ++count;
+                    if (max < low[adjancentNode])
+                        max = low[adjancentNode];
                 }
+                else if (adjancentNode != prevNode)
+                    if (low[node] > pre[adjancentNode])
+                        low[node] = pre[adjancentNode];
             }
             if ((prevNode != -1 && max >= pre[node]) || (prevNode == -1 && (adjancentNodes.Length == 0 || count > 1)))
                 stack.Push(node);
