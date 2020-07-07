@@ -4,13 +4,6 @@ namespace lesson._16.cs
 {
     class Graph
     {
-        public enum NodeColors
-        {
-            White,
-            Gray,
-            Black,
-        };
-
         public AdjancenceVector Data { get; set; }
 
         public Graph(AdjancenceVector adjancenceVector)
@@ -104,6 +97,13 @@ namespace lesson._16.cs
         //    return true;
         //}
 
+        public enum NodeColors
+        {
+            White,
+            Gray,
+            Black,
+        };
+
         public int[][] Tarjan()
         {
             NodeStack<NodeQueue<int>> skewStackQueue = new NodeStack<NodeQueue<int>>();
@@ -177,6 +177,71 @@ namespace lesson._16.cs
             return Util.SkewListToArray(skewStackQueue);
         }
 
+        struct TarjanRecursiveState
+        {
+            public Graph graph;
+
+            public int order;
+            public int[] pre;
+            public int[] low;
+            public NodeStack<int> stack;
+
+            public NodeStack<NodeQueue<int>> skewStackQueue;
+
+            public TarjanRecursiveState(Graph graph)
+            {
+                this.graph = graph;
+
+                order = 0;
+                pre = new int[graph.Data.NodesCount];
+                low = new int[graph.Data.NodesCount];
+                stack = new NodeStack<int>();
+
+                Array.Fill(pre, -1);
+
+                skewStackQueue = new NodeStack<NodeQueue<int>>();
+            }
+        }
+
+        public int[][] TarjanRecursive()
+        {
+            TarjanRecursiveState state = new TarjanRecursiveState(this);
+
+            for (int node = 0; node < state.graph.Data.NodesCount; ++node)
+                if (state.pre[node] == -1)
+                    TarjanRecursive(node, state);
+
+            return Util.SkewListToArray(state.skewStackQueue);
+        }
+
+        void TarjanRecursive(int node, TarjanRecursiveState state)
+        {
+            int min = state.pre[node] = state.low[node] = state.order++;
+            state.stack.Push(node);
+
+            int[] adjancentNodes = state.graph.Data.Data[node];
+            for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
+            {
+                int adjancentNode = adjancentNodes[incendence];
+                if (state.pre[adjancentNode] == -1)
+                    TarjanRecursive(adjancentNode, state);
+                if (min > state.low[adjancentNode])
+                    min = state.low[adjancentNode];
+            }
+            if (state.low[node] > min)
+            {
+                state.low[node] = min;
+                return;
+            }
+
+            state.skewStackQueue.Push(new NodeQueue<int>());
+            do
+            {
+                state.skewStackQueue.Top.Enque(state.stack.Pop());
+                state.low[state.skewStackQueue.Top.Last] = state.graph.Data.NodesCount;
+            } while (state.skewStackQueue.Top.Last != node);
+        }
+
         public int[] ArticulationNodes()
         {
             int baseConnectionRank = Tarjan().Length;
@@ -195,7 +260,8 @@ namespace lesson._16.cs
 
         public (int, int)[] BridgeEdges(bool directed = true)
         {
-            int baseConnectionRank = Tarjan().Length;
+            int[][] baseStrongConnection = Tarjan();
+            int baseConnectionRank = baseStrongConnection.Length;
 
             NodeStack<(int, int)> bridgeStack = new NodeStack<(int, int)>();
 
@@ -205,13 +271,142 @@ namespace lesson._16.cs
                 for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
                 {
                     int adjancentNode = adjancentNodes[incendence];
+
                     Graph reducedGraph = new Graph(Data.RemoveEdge(node, adjancentNode, directed));
-                    if (baseConnectionRank != reducedGraph.Tarjan().Length)
+
+                    int[][] strongConnection = reducedGraph.Tarjan();
+                    if (baseConnectionRank != strongConnection.Length)
                         bridgeStack.Push((node, adjancentNode));
                 }
             }
 
             return Util.ListToArray<(int, int)>(bridgeStack);
+        }
+
+        class ArticulationNodesRecursiveState
+        {
+            public Graph graph;
+
+            public int order;
+            public int[] pre;
+            public int[] low;
+            public int[] up;
+
+            public NodeStack<int> nodes;
+
+            public ArticulationNodesRecursiveState(Graph graph)
+            {
+                this.graph = graph;
+
+                order = 0;
+                pre = new int[graph.Data.NodesCount];
+                low = new int[graph.Data.NodesCount];
+                up = new int[graph.Data.NodesCount];
+
+                Array.Fill(pre, -1);
+
+                nodes = new NodeStack<int>();
+            }
+        }
+
+        public int[] ArticulationNodesRecursive()
+        {
+            ArticulationNodesRecursiveState state = new ArticulationNodesRecursiveState(this);
+
+            for (int node = 0; node < state.graph.Data.NodesCount; ++node)
+                if (state.pre[node] == -1)
+                    ArticulationNodesRecursive(node, -1, state);
+
+            return Util.ListToArray(state.nodes);
+        }
+
+        void ArticulationNodesRecursive(int node, int prevNode, ArticulationNodesRecursiveState state)
+        {
+            int count = 0;
+            int max = 0;
+
+            state.pre[node] = state.low[node] = state.order++;
+
+            int[] adjancentNodes = state.graph.Data.Data[node];
+            for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
+            {
+                int adjancentNode = adjancentNodes[incendence];
+                if (adjancentNode != prevNode)
+                {
+                    if (state.pre[adjancentNode] == -1)
+                    {
+                        ArticulationNodesRecursive(adjancentNode, node, state);
+                        if (state.low[node] > state.low[adjancentNode])
+                            state.low[node] = state.low[adjancentNode];
+
+                        ++count;
+                        if (max < state.low[adjancentNode])
+                            max = state.low[adjancentNode];
+                    }
+                    else if (state.low[node] > state.pre[adjancentNode])
+                        state.low[node] = state.pre[adjancentNode];
+
+                }
+            }
+            if ((prevNode != -1 && max >= state.pre[node]) || (prevNode == -1 && (adjancentNodes.Length == 0 || count > 1)))
+                state.nodes.Push(node);
+        }
+
+        class BridgeEdgesRecursiveState
+        {
+            public Graph graph;
+
+            public int order;
+            public int[] pre;
+            public int[] low;
+
+            public NodeStack<(int, int)> bridges;
+
+            public BridgeEdgesRecursiveState(Graph graph)
+            {
+                this.graph = graph;
+
+                order = 0;
+                pre = new int[graph.Data.NodesCount];
+                low = new int[graph.Data.NodesCount];
+
+                Array.Fill(pre, -1);
+
+                bridges = new NodeStack<(int, int)>();
+            }
+        }
+
+        public (int, int)[] BridgeEdgesRecursive()
+        {
+            BridgeEdgesRecursiveState state = new BridgeEdgesRecursiveState(this);
+
+            for (int node = 0; node < state.graph.Data.NodesCount; ++node)
+                if (state.pre[node] == -1)
+                    BridgeEdgesRecursive(node, -1, state);
+
+            return Util.ListToArray(state.bridges);
+        }
+
+        void BridgeEdgesRecursive(int node, int prevNode, BridgeEdgesRecursiveState state)
+        {
+            state.pre[node] = state.low[node] = state.order++;
+
+            int[] adjancentNodes = state.graph.Data.Data[node];
+            for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
+            {
+                int adjancentNode = adjancentNodes[incendence];
+                if (state.pre[adjancentNode] == -1)
+                {
+                    BridgeEdgesRecursive(adjancentNode, node, state);
+                    if (state.low[node] > state.low[adjancentNode])
+                        state.low[node] = state.low[adjancentNode];
+                    if (state.low[adjancentNode] == state.pre[adjancentNode])
+                        state.bridges.Push((node, adjancentNode));
+                }
+                else if (adjancentNode != prevNode)
+                    if (state.low[node] > state.pre[adjancentNode])
+                        state.low[node] = state.pre[adjancentNode];
+            }
         }
     }
 }

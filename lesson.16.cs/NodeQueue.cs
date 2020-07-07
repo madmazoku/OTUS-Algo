@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.Design.Serialization;
-using System.Drawing;
-
-namespace lesson._16.cs
+﻿namespace lesson._16.cs
 {
     class NodeQueue<T>
     {

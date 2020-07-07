@@ -5,7 +5,7 @@
         public int size;
         public Node<T> top;
 
-        public T Top {  get { return top.value; } set { top.value = value; } }
+        public T Top { get { return top.value; } set { top.value = value; } }
 
         public Node<T> Detach()
         {
