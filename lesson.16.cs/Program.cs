@@ -6,7 +6,7 @@ namespace lesson._16.cs
     {
         static void TestDemucron()
         {
-            Console.WriteLine(new String('-', Console.WindowWidth));
+            Console.WriteLine(new String('-', Console.WindowWidth - 1));
             Console.WriteLine("Test Demucron");
 
             AdjancenceVector adjancenceVector = new AdjancenceVector(new int[][] {
@@ -40,7 +40,7 @@ namespace lesson._16.cs
 
         static void TestTarjan()
         {
-            Console.WriteLine(new String('-', Console.WindowWidth));
+            Console.WriteLine(new String('-', Console.WindowWidth - 1));
             Console.WriteLine("Test Tarjan strong connected groups search");
 
             // eng wiki
@@ -92,7 +92,7 @@ namespace lesson._16.cs
 
         static void TestArticulation()
         {
-            Console.WriteLine(new String('-', Console.WindowWidth));
+            Console.WriteLine(new String('-', Console.WindowWidth - 1));
             Console.WriteLine("Test articulation nodes search");
 
             //AdjancenceVector adjancenceVector = new AdjancenceVector(new int[][] {
@@ -130,7 +130,7 @@ namespace lesson._16.cs
 
         static void TestBridge()
         {
-            Console.WriteLine(new String('-', Console.WindowWidth));
+            Console.WriteLine(new String('-', Console.WindowWidth - 1));
             Console.WriteLine("Test bridge edge search");
 
             //// Bridge: 3 -> 4
