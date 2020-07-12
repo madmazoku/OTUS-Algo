@@ -7,6 +7,9 @@ namespace lesson._17.cs
     {
         static void TestKruskal()
         {
+            Console.WriteLine(new String('-', Console.WindowWidth - 1));
+            Console.WriteLine("Test Kruskal algorithm");
+
             AdjancenceVector<double> adjancenceVector = new AdjancenceVector<double>(new (int, double)[][] {
                 /* 0 A */new (int, double)[] { (1, 7.0), (3, 5.0) },
                 /* 1 B */new (int, double)[] { (2, 8.0), (3, 9.0), (4, 7.0) },
@@ -27,6 +30,9 @@ namespace lesson._17.cs
 
         static void TestPrim()
         {
+            Console.WriteLine(new String('-', Console.WindowWidth - 1));
+            Console.WriteLine("Test Prim algorithm");
+
             AdjancenceVector<double> adjancenceVector = new AdjancenceVector<double>(new (int, double)[][] {
                 /* 0 A */new (int, double)[] { (1, 7.0), (3, 5.0) },
                 /* 1 B */new (int, double)[] { (2, 8.0), (3, 9.0), (4, 7.0) },
@@ -48,6 +54,9 @@ namespace lesson._17.cs
 
         static void TestBoruvka()
         {
+            Console.WriteLine(new String('-', Console.WindowWidth - 1));
+            Console.WriteLine("Test Boruvka algorithm");
+
             AdjancenceVector<double> adjancenceVector = new AdjancenceVector<double>(new (int, double)[][] {
                 /* 0 A */new (int, double)[] { (1, 7.0), (3, 5.0) },
                 /* 1 B */new (int, double)[] { (2, 8.0), (3, 9.0), (4, 7.0) },
