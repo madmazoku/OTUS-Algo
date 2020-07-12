@@ -129,7 +129,7 @@ namespace lesson._16.cs
             Console.WriteLine("Strong Connected Nodes (iterative)");
             Util.Print(graph.Tarjan());
 
-            Console.WriteLine("Bridge edges (brootforce) Strong?");
+            Console.WriteLine("Bridge edges (bruteforce) Strong?");
             Util.Print(graph.BridgeEdges());
 
             Console.WriteLine("Bridge edges (recursive) Weak?");

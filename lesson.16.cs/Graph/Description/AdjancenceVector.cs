@@ -74,7 +74,8 @@ namespace lesson._16.cs
                     for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
                     {
                         (int adjancentNode, T edgeData) = adjancentNodes[incendence];
-                        skewStack.Top.Push((adjancentNode < node ? adjancentNode : adjancentNode - 1, edgeData));
+                        if (adjancentNode != node)
+                            skewStack.Top.Push((adjancentNode < node ? adjancentNode : adjancentNode - 1, edgeData));
                     }
 
                 }
