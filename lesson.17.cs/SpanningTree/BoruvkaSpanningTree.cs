@@ -17,48 +17,6 @@ namespace lesson._17.cs
             data = null;
         }
 
-        void Build1()
-        {
-            if (data != null)
-                return;
-
-            NodeStack<(int, int, T)> spanningTree = new NodeStack<(int, int, T)>();
-
-            UnionFind nodeRoot = new UnionFind(graph.NodesCount);
-            (int, T?)[] nearest = new (int, T?)[graph.NodesCount];
-
-
-            do
-            {
-                int foundEdges = 0;
-                Array.Fill(nearest, (-1, null));
-                for (int node = 0; node < graph.NodesCount; ++node)
-                {
-                    (int, T)[] adjancentNodes = graph.Data[node];
-                    for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
-                    {
-                        (int adjancentNode, T edgeData) = adjancentNodes[incendence];
-                        if (!nodeRoot.HasOneRoot(node, adjancentNode))
-                            if (nearest[node].Item2 == null || edgeData.CompareTo(nearest[node].Item2.Value) < 0)
-                                nearest[node] = (adjancentNode, edgeData);
-                    }
-                    if (nearest[node].Item2.HasValue)
-                        ++foundEdges;
-                }
-                if (foundEdges == 0)
-                    break;
-                for (int node = 0; node < graph.NodesCount; ++node)
-                    if (nearest[node].Item2 != null)
-                    {
-                        (int adjancentNode, T? edgeData) = nearest[node];
-                        spanningTree.Push((node, adjancentNode, edgeData.Value));
-                        nodeRoot.Merge(node, adjancentNode);
-                    }
-            } while (nodeRoot.Groups > 1);
-
-            data = new EdgeArray<T>(graph.NodesCount, Util.ListToArray<(int, int, T)>(spanningTree));
-        }
-
         void Build()
         {
             if (data != null)
