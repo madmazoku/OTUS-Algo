@@ -21,6 +21,7 @@ namespace lesson._12.cs
 
         Node[] array;
         int size;
+        int thresholdSize;
 
         static readonly int c1 = 7;
         static readonly int c2 = 3;
@@ -46,12 +47,14 @@ namespace lesson._12.cs
         {
             this.hash = hashBase;
             array = new Node[startArraySize];
+            thresholdSize = (int)(loadFactor * array.Length);
         }
 
         public OpenHashTable(Func<string, int, int> hash)
         {
             this.hash = hash;
             array = new Node[startArraySize];
+            thresholdSize = (int)(loadFactor * array.Length);
         }
 
         public string Insert(string key, string value)
@@ -131,7 +134,7 @@ namespace lesson._12.cs
 
         void IncrementSize()
         {
-            if (++size < loadFactor * array.Length)
+            if (++size < thresholdSize)
                 return;
 
             Node[] newArray = new Node[array.Length << 1];
@@ -156,6 +159,7 @@ namespace lesson._12.cs
             }
 
             array = newArray;
+            thresholdSize = (int)(loadFactor * array.Length);
         }
 
         void DecrementSize()

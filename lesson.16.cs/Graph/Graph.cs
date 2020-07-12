@@ -2,11 +2,12 @@
 
 namespace lesson._16.cs
 {
-    class Graph
+    class Graph<T>
+        where T : struct
     {
-        public AdjancenceVector Data { get; set; }
+        public AdjancenceVector<T> Data { get; set; }
 
-        public Graph(AdjancenceVector adjancenceVector)
+        public Graph(AdjancenceVector<T> adjancenceVector)
         {
             Data = adjancenceVector;
         }
@@ -45,10 +46,10 @@ namespace lesson._16.cs
         public bool TarjanRecursiveDSF(int node, NodeStack<int> stack, NodeColors[] nodeColors)
         {
             nodeColors[node] = NodeColors.Gray;
-            int[] adjancentNodes = Data.Data[node];
+            (int, T)[] adjancentNodes = Data.Data[node];
             for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
             {
-                int anotherNode = adjancentNodes[incendence];
+                (int anotherNode, _) = adjancentNodes[incendence];
                 if (nodeColors[anotherNode] == NodeColors.White)
                 {
                     if (!TarjanRecursiveDSF(anotherNode, stack, nodeColors))
@@ -95,7 +96,7 @@ namespace lesson._16.cs
                     while (incendenceStack.Top > 0)
                     {
                         --incendenceStack.Top;
-                        int adjancentNode = Data.Data[nodeStack.Top][incendenceStack.Top];
+                        (int adjancentNode, _) = Data.Data[nodeStack.Top][incendenceStack.Top];
                         if (nodeColors[adjancentNode] == NodeColors.White)
                         {
                             nodeStack.Push(adjancentNode);
@@ -129,7 +130,7 @@ namespace lesson._16.cs
                     }
                     if (nodeStack.size > 0)
                     {
-                        int adjancentNode = Data.Data[nodeStack.Top][incendenceStack.Top];
+                        (int adjancentNode, _) = Data.Data[nodeStack.Top][incendenceStack.Top];
                         if (minStack.Top > low[adjancentNode])
                             minStack.Top = low[adjancentNode];
                     }
@@ -147,7 +148,7 @@ namespace lesson._16.cs
 
             for (int node = 0; node < Data.NodesCount; ++node)
             {
-                Graph reducedGraph = new Graph(Data.RemoveNode(node));
+                Graph<T> reducedGraph = new Graph<T>(Data.RemoveNode(node));
                 if (baseConnectionRank != reducedGraph.Tarjan().Length)
                     articulationStack.Push(node);
             }
@@ -155,29 +156,29 @@ namespace lesson._16.cs
             return Util.ListToArray(articulationStack);
         }
 
-        public (int, int)[] BridgeEdges(bool directed = true)
+        public EdgeArray<T> BridgeEdges(bool directed = true)
         {
             int[][] baseStrongConnection = Tarjan();
             int baseConnectionRank = baseStrongConnection.Length;
 
-            NodeStack<(int, int)> bridgeStack = new NodeStack<(int, int)>();
+            NodeStack<(int, int, T)> bridgeStack = new NodeStack<(int, int, T)>();
 
             for (int node = 0; node < Data.NodesCount; ++node)
             {
-                int[] adjancentNodes = Data.Data[node];
+                (int, T)[] adjancentNodes = Data.Data[node];
                 for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
                 {
-                    int adjancentNode = adjancentNodes[incendence];
+                    (int adjancentNode, T edgeData) = adjancentNodes[incendence];
 
-                    Graph reducedGraph = new Graph(Data.RemoveEdge(node, adjancentNode, directed));
+                    Graph<T> reducedGraph = new Graph<T>(Data.RemoveEdge(node, adjancentNode, directed));
 
                     int[][] strongConnection = reducedGraph.Tarjan();
                     if (baseConnectionRank != strongConnection.Length)
-                        bridgeStack.Push((node, adjancentNode));
+                        bridgeStack.Push((node, adjancentNode, edgeData));
                 }
             }
 
-            return Util.ListToArray<(int, int)>(bridgeStack);
+            return new EdgeArray<T>(Data.NodesCount, Util.ListToArray<(int, int, T)>(bridgeStack));
         }
 
     }

@@ -22,6 +22,7 @@ namespace lesson._12.cs
 
         Node[] array;
         int size;
+        int thresholdSize;
 
         static readonly double loadFactor = 0.7;
         static readonly int startArraySize = 10;
@@ -38,12 +39,14 @@ namespace lesson._12.cs
         {
             this.hash = hashBase;
             array = new Node[startArraySize];
+            thresholdSize = (int)(loadFactor * array.Length);
         }
 
         public LinkedHashTable(Func<string, int, int> hash)
         {
             this.hash = hash;
             array = new Node[startArraySize];
+            thresholdSize = (int)(loadFactor * array.Length);
         }
 
         public string Insert(string key, string value)
@@ -100,7 +103,7 @@ namespace lesson._12.cs
 
         void SizeIncrement()
         {
-            if (++size < loadFactor * array.Length)
+            if (++size < thresholdSize)
                 return;
 
             Node[] newArray = new Node[array.Length << 1];
@@ -119,6 +122,7 @@ namespace lesson._12.cs
                 }
             }
             array = newArray;
+            thresholdSize = (int)(loadFactor * array.Length);
         }
 
         void SizeDecrement()

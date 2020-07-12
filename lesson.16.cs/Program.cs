@@ -9,31 +9,35 @@ namespace lesson._16.cs
             Console.WriteLine(new String('-', Console.WindowWidth - 1));
             Console.WriteLine("Test Demucron");
 
-            AdjancenceVector adjancenceVector = new AdjancenceVector(new int[][] {
-                /*  0 */new int[] { 2, 12 },
-                /*  1 */new int[] { 12 },
-                /*  2 */new int[] { },
-                /*  3 */new int[] { 2 },
-                /*  4 */new int[] { 2, 8, 9 },
-                /*  5 */new int[] { 3, 10, 11, 12 },
-                /*  6 */new int[] { 5, 10 },
-                /*  7 */new int[] { 1, 3, 5, 6, },
-                /*  8 */new int[] { 0, 13 },
-                /*  9 */new int[] { 0, 6, 11},
-                /* 10 */new int[] { 2 },
-                /* 11 */new int[] { },
-                /* 12 */new int[] { 2 },
-                /* 13 */new int[] { 10 },
+            AdjancenceVector<double> adjancenceVector = new AdjancenceVector<double>(new (int, double)[][] {
+                /*  0 */new (int, double)[] { (2, 1.0), (12, 1.0) },
+                /*  1 */new (int, double)[] { (12, 1.0) },
+                /*  2 */new (int, double)[] { },
+                /*  3 */new (int, double)[] { (2, 1.0) },
+                /*  4 */new (int, double)[] { (2, 1.0), (8, 1.0), (9, 1.0) },
+                /*  5 */new (int, double)[] { (3, 1.0), (10, 1.0), (11, 1.0), (12, 1.0) },
+                /*  6 */new (int, double)[] { (5, 1.0), (10, 1.0) },
+                /*  7 */new (int, double)[] { (1, 1.0), (3, 1.0), (5, 1.0), (6, 1.0), },
+                /*  8 */new (int, double)[] { (0, 1.0), (13, 1.0) },
+                /*  9 */new (int, double)[] { (0, 1.0), (6, 1.0), (11, 1.0)},
+                /* 10 */new (int, double)[] { (2, 1.0) },
+                /* 11 */new (int, double)[] { },
+                /* 12 */new (int, double)[] { (2, 1.0) },
+                /* 13 */new (int, double)[] { (10, 1.0) },
             });
             Console.WriteLine("adjancenceVector");
-            adjancenceVector.Print();
+            Util.Print(adjancenceVector);
 
-            AdjancenceArray adjancenceArray = new AdjancenceArray(adjancenceVector);
+            AdjancenceArray<double> adjancenceArray = new AdjancenceArray<double>(adjancenceVector);
             Console.WriteLine("adjancenceArray");
-            adjancenceArray.Print();
+            Util.Print(adjancenceArray);
+
+            EdgeArray<double> edgeArray = new EdgeArray<double>(adjancenceVector);
+            Console.WriteLine("edgeArray");
+            Util.Print(edgeArray);
 
             Console.WriteLine("Gant's datagramm");
-            Util.Print((new DemucronLevels(adjancenceVector)).Data);
+            Util.Print((new DemucronLevels<double>(adjancenceVector)).Data);
 
             Console.WriteLine("");
         }
@@ -43,49 +47,28 @@ namespace lesson._16.cs
             Console.WriteLine(new String('-', Console.WindowWidth - 1));
             Console.WriteLine("Test Tarjan strong connected groups search");
 
-            // eng wiki
-            //AdjancenceVector adjancenceVector = new AdjancenceVector(new int[][] {
-            //    /*  0 */new int[] { 1 },
-            //    /*  1 */new int[] { 2 },
-            //    /*  2 */new int[] { 0 },
-            //    /*  3 */new int[] { 1, 2, 4 },
-            //    /*  4 */new int[] { 3, 5 },
-            //    /*  5 */new int[] { 2, 6 },
-            //    /*  6 */new int[] { 5 },
-            //    /*  7 */new int[] { 4, 6, 7 },
-            //});
             // lesson
-            AdjancenceVector adjancenceVector = new AdjancenceVector(new int[][] {
-                /*  0 */new int[] { 1 },
-                /*  1 */new int[] { 2, 4, 5 },
-                /*  2 */new int[] { 3, 5 },
-                /*  3 */new int[] { 2, 7 },
-                /*  4 */new int[] { 0, 5 },
-                /*  5 */new int[] { 6 },
-                /*  6 */new int[] { 5 },
-                /*  7 */new int[] { 3, 6 },
+            AdjancenceVector<double> adjancenceVector = new AdjancenceVector<double>(new (int, double)[][] {
+                /*  0 */new (int, double)[] { (1, 1.0) },
+                /*  1 */new (int, double)[] { (2, 1.0), (4, 1.0), (5, 1.0) },
+                /*  2 */new (int, double)[] { (3, 1.0), (5, 1.0) },
+                /*  3 */new (int, double)[] { (2, 1.0), (7, 1.0) },
+                /*  4 */new (int, double)[] { (0, 1.0), (5, 1.0) },
+                /*  5 */new (int, double)[] { (6, 1.0) },
+                /*  6 */new (int, double)[] { (5, 1.0) },
+                /*  7 */new (int, double)[] { (3, 1.0), (6, 1.0) },
             });
-            //// lesson reversed edge order
-            //AdjancenceVector adjancenceVector = new AdjancenceVector(new int[][] {
-            //    /*  0 */new int[] { 1 },
-            //    /*  1 */new int[] { 5, 4, 2 },
-            //    /*  2 */new int[] { 5, 3 },
-            //    /*  3 */new int[] { 7, 2 },
-            //    /*  4 */new int[] { 5, 0 },
-            //    /*  5 */new int[] { 6 },
-            //    /*  6 */new int[] { 5 },
-            //    /*  7 */new int[] { 6, 3 },
-            //});
-            Console.WriteLine("adjancenceVector");
-            adjancenceVector.Print();
 
-            Graph graph = new Graph(adjancenceVector);
+            Console.WriteLine("adjancenceVector");
+            Util.Print(adjancenceVector);
+
+            Graph<double> graph = new Graph<double>(adjancenceVector);
 
             Console.WriteLine("Strong Connected Nodes (iterative)");
             Util.Print(graph.Tarjan());
 
             Console.WriteLine("Strong Connected Nodes (recursive)");
-            Util.Print((new TarjanStrongConnected(adjancenceVector)).Data);
+            Util.Print((new TarjanStrongConnected<double>(adjancenceVector)).Data);
 
             Console.WriteLine("");
         }
@@ -95,35 +78,26 @@ namespace lesson._16.cs
             Console.WriteLine(new String('-', Console.WindowWidth - 1));
             Console.WriteLine("Test articulation nodes search");
 
-            //AdjancenceVector adjancenceVector = new AdjancenceVector(new int[][] {
-            //    /*  0 */new int[] { 1, 2 },
-            //    /*  1 */new int[] { 0, 3 },
-            //    /*  2 */new int[] { 0, 3 },
-            //    /*  3 */new int[] { 1, 2, 4, 5 },
-            //    /*  4 */new int[] { 3, 6 },
-            //    /*  5 */new int[] { 3, 6 },
-            //    /*  6 */new int[] { 4, 5 },
-            //});
             // Bridge: 1, 3; from lesson's pdf, but 4 (edgeless node) is articulation point too
-            AdjancenceVector adjancenceVector = new AdjancenceVector(new int[][] {
-                /*  0 */new int[] { 1, 3 },
-                /*  1 */new int[] { 0, 2, 3 },
-                /*  2 */new int[] { 1 },
-                /*  3 */new int[] { 0, 1, 5, 6 },
-                /*  4 */new int[] { },
-                /*  5 */new int[] { 3, 6 },
-                /*  6 */new int[] { 3, 5 },
+            AdjancenceVector<double> adjancenceVector = new AdjancenceVector<double>(new (int, double)[][] {
+                /*  0 */new (int, double)[] { (1, 1.0), (3, 1.0) },
+                /*  1 */new (int, double)[] { (0, 1.0), (2, 1.0), (3, 1.0) },
+                /*  2 */new (int, double)[] { (1, 1.0) },
+                /*  3 */new (int, double)[] { (0, 1.0), (1, 1.0), (5, 1.0), (6, 1.0) },
+                /*  4 */new (int, double)[] { },
+                /*  5 */new (int, double)[] { (3, 1.0), (6, 1.0) },
+                /*  6 */new (int, double)[] { (3, 1.0), (5, 1.0) },
             });
             Console.WriteLine("adjancenceVector");
-            adjancenceVector.Print();
+            Util.Print(adjancenceVector);
 
-            Graph graph = new Graph(adjancenceVector);
+            Graph<double> graph = new Graph<double>(adjancenceVector);
 
             Console.WriteLine("Articulation nodes (bruteforce)");
             Util.Print(graph.ArticulationNodes());
 
             Console.WriteLine("Articulation nodes (recursive)");
-            Util.Print((new ArticulationNodes(adjancenceVector)).Data);
+            Util.Print((new ArticulationNodes<double>(adjancenceVector)).Data);
 
             Console.WriteLine("");
         }
@@ -133,48 +107,24 @@ namespace lesson._16.cs
             Console.WriteLine(new String('-', Console.WindowWidth - 1));
             Console.WriteLine("Test bridge edge search");
 
-            //// Bridge: 3 -> 4
-            //AdjancenceVector adjancenceVector = new AdjancenceVector(new int[][] {
-            //    /*  0 */new int[] { 1, 2 },
-            //    /*  1 */new int[] { 0, 3 },
-            //    /*  2 */new int[] { 0, 3 },
-            //    /*  3 */new int[] { 1, 2, 4},
-            //    /*  4 */new int[] { 3, 5, 6 },
-            //    /*  5 */new int[] { 4, 7 },
-            //    /*  6 */new int[] { 4, 7 },
-            //    /*  7 */new int[] { 5, 6 },
-            //});
             // Bridge: 2 -> 3, 7 -> 8, 5 -> 9; from lesson's pdf; but what about 0 -> 1, 1 -> 2, etc which create new groups?
-            AdjancenceVector adjancenceVector = new AdjancenceVector(new int[][] {
-                /*  0 */new int[] { 1, 2 },
-                /*  1 */new int[] { 2 },
-                /*  2 */new int[] { 0, 3 },
-                /*  3 */new int[] { 4, 5, 6, 7 },
-                /*  4 */new int[] { 5 },
-                /*  5 */new int[] { 3, 9 },
-                /*  6 */new int[] { 7 },
-                /*  7 */new int[] { 3, 8 },
-                /*  8 */new int[] { },
-                /*  9 */new int[] { },
+            AdjancenceVector<double> adjancenceVector = new AdjancenceVector<double>(new (int, double)[][] {
+                /*  0 */new (int, double)[] { (1, 1.0), (2, 1.0) },
+                /*  1 */new (int, double)[] { (2, 1.0) },
+                /*  2 */new (int, double)[] { (0, 1.0), (3, 1.0) },
+                /*  3 */new (int, double)[] { (4, 1.0), (5, 1.0), (6, 1.0), (7, 1.0) },
+                /*  4 */new (int, double)[] { (5, 1.0) },
+                /*  5 */new (int, double)[] { (3, 1.0), (9, 1.0) },
+                /*  6 */new (int, double)[] { (7, 1.0) },
+                /*  7 */new (int, double)[] { (3, 1.0), (8, 1.0) },
+                /*  8 */new (int, double)[] { },
+                /*  9 */new (int, double)[] { },
             });
-            //// the same as above, but dual links
-            //AdjancenceVector adjancenceVector = new AdjancenceVector(new int[][] {
-            //    /*  0 */new int[] { 1, 2 },
-            //    /*  1 */new int[] { 0, 2 },
-            //    /*  2 */new int[] { 0, 1, 3 },
-            //    /*  3 */new int[] { 2, 4, 5, 6, 7 },
-            //    /*  4 */new int[] { 3, 5 },
-            //    /*  5 */new int[] { 3, 4, 9 },
-            //    /*  6 */new int[] { 3, 7 },
-            //    /*  7 */new int[] { 3, 6, 8 },
-            //    /*  8 */new int[] { 7 },
-            //    /*  9 */new int[] { 5 },
-            //});
 
             Console.WriteLine("adjancenceVector");
-            adjancenceVector.Print();
+            Util.Print(adjancenceVector);
 
-            Graph graph = new Graph(adjancenceVector);
+            Graph<double> graph = new Graph<double>(adjancenceVector);
 
             Console.WriteLine("Strong Connected Nodes (iterative)");
             Util.Print(graph.Tarjan());
@@ -183,7 +133,7 @@ namespace lesson._16.cs
             Util.Print(graph.BridgeEdges());
 
             Console.WriteLine("Bridge edges (recursive) Weak?");
-            Util.Print((new BridgeEdges(adjancenceVector)).Data);
+            Util.Print((new BridgeEdges<double>(adjancenceVector)).Data);
 
             Console.WriteLine("");
         }

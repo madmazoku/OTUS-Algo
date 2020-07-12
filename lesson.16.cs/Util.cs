@@ -2,24 +2,8 @@
 
 namespace lesson._16.cs
 {
-    class Util
+    public class Util
     {
-        static public void Print((int, int)[] array)
-        {
-            if (array.Length == 0)
-                Console.WriteLine("Empty");
-            else
-            {
-                (int from, int to) = array[0];
-                Console.Write($"{from,2} -> {to,-2}");
-                for (int y = 1; y < array.Length; ++y)
-                {
-                    (from, to) = array[y];
-                    Console.Write($"; {from,2} -> {to,-2}");
-                }
-                Console.WriteLine("");
-            }
-        }
 
         static public void Print(int[] array)
         {
@@ -40,7 +24,7 @@ namespace lesson._16.cs
             for (int y = 0; y < skewArray.Length; ++y)
             {
                 Console.ForegroundColor = ConsoleColor.Gray;
-                Console.Write($" {y,2}:");
+                Console.Write($" {y,2}: ");
                 Console.ForegroundColor = ConsoleColor.White;
                 int[] subArray = skewArray[y];
                 if (subArray.Length > 0)
@@ -64,40 +48,116 @@ namespace lesson._16.cs
             Console.WriteLine("");
         }
 
-        static public void Print(bool[,] matrix)
+        static public void Print(AdjancenceVector<double> graph)
         {
+            if (graph.NodesCount == 0)
+            {
+                Console.WriteLine("No nodes\n");
+                return;
+            }
+
             (ConsoleColor foregroundColor, ConsoleColor backgroundColor) = (Console.ForegroundColor, Console.BackgroundColor);
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.Write($"    ");
-            for (int x = 0; x < matrix.GetLength(1); ++x)
-                Console.Write($"{x,3}|");
-            Console.Write($"    ");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("");
-            for (int y = 0; y < matrix.GetLength(0); ++y)
+            for (int node = 0; node < graph.NodesCount; ++node)
             {
                 Console.ForegroundColor = ConsoleColor.Gray;
-                Console.Write($"{y,-3}|");
+                Console.Write($" {node,2}:");
                 Console.ForegroundColor = ConsoleColor.White;
-                for (int x = 0; x < matrix.GetLength(1); ++x)
+                (int, double)[] adjancentNodes = graph.Data[node];
+                if (adjancentNodes.Length > 0)
+                    for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
+                    {
+                        (int adjancentNode, double weight) = adjancentNodes[incendence];
+                        Console.BackgroundColor = (node & 0x1) == 0 ? ConsoleColor.Black : ConsoleColor.DarkGray;
+                        Console.Write($" {adjancentNode,2}, {weight,6:g5} ");
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write("|");
+                    }
+                else
                 {
-                    Console.BackgroundColor = (y & 0x1) == 0 ? ConsoleColor.Black : ConsoleColor.DarkGray;
-                    Console.Write(matrix[y, x] ? " 1 " : " 0 ");
+                    Console.BackgroundColor = (node & 0x1) == 0 ? ConsoleColor.Black : ConsoleColor.DarkGray;
+                    Console.Write($"            ");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write("|");
+                }
+                Console.WriteLine("");
+            }
+            (Console.ForegroundColor, Console.BackgroundColor) = (foregroundColor, backgroundColor);
+            Console.WriteLine("");
+        }
+
+        static public void Print(AdjancenceArray<double> graph)
+        {
+            if (graph.NodesCount == 0)
+            {
+                Console.WriteLine("No nodes\n");
+                return;
+            }
+
+            (ConsoleColor foregroundColor, ConsoleColor backgroundColor) = (Console.ForegroundColor, Console.BackgroundColor);
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.Write($"      |");
+            for (int node = 0; node < graph.NodesCount; ++node)
+                Console.Write($"{node,6}|");
+            Console.Write($"     ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("");
+            for (int from = 0; from < graph.NodesCount; ++from)
+            {
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.Write($"{from,6}|");
+                Console.ForegroundColor = ConsoleColor.White;
+                for (int to = 0; to < graph.NodesCount; ++to)
+                {
+                    Console.BackgroundColor = (from & 0x1) == 0 ? ConsoleColor.Black : ConsoleColor.DarkGray;
+                    if (graph.HasEdge(from, to))
+                        Console.Write($"{graph.GetEdgeData(from, to),6:g5}");
+                    else
+                        Console.Write("      ");
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write("|");
                 }
                 Console.ForegroundColor = ConsoleColor.Gray;
-                Console.Write($"{y,3}");
+                Console.Write($"{from,-6}");
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("");
             }
             Console.ForegroundColor = ConsoleColor.Gray;
-            Console.Write($"    ");
-            for (int x = 0; x < matrix.GetLength(1); ++x)
-                Console.Write($"{x,3}|");
-            Console.Write($"    ");
+            Console.Write($"      |");
+            for (int node = 0; node < graph.NodesCount; ++node)
+                Console.Write($"{node,6}|");
+            Console.Write($"     ");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("");
+            (Console.ForegroundColor, Console.BackgroundColor) = (foregroundColor, backgroundColor);
+            Console.WriteLine("");
+        }
+
+        static public void Print(EdgeArray<double> graph)
+        {
+            if (graph.NodesCount == 0)
+            {
+                Console.WriteLine("No nodes\n");
+                return;
+            }
+            if (graph.Data.Length == 0)
+            {
+                Console.WriteLine("No edges\n");
+                return;
+            }
+
+            (ConsoleColor foregroundColor, ConsoleColor backgroundColor) = (Console.ForegroundColor, Console.BackgroundColor);
+            (int from, int to, double weight) = graph.Data[0];
+            for (int edge = 0; edge < graph.Data.Length; ++edge)
+            {
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.Write($" {edge,2}: ");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.BackgroundColor = (edge & 0x1) == 0 ? ConsoleColor.Black : ConsoleColor.DarkGray;
+                (from, to, weight) = graph.Data[edge];
+                Console.Write($"({from,2} -> {to,2}), {weight,6:g5}");
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.WriteLine(" |");
+            }
             (Console.ForegroundColor, Console.BackgroundColor) = (foregroundColor, backgroundColor);
             Console.WriteLine("");
         }

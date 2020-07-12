@@ -1,6 +1,8 @@
-﻿namespace lesson._16.cs
+﻿using System;
+
+namespace lesson._16.cs
 {
-    class NodeQueue<T>
+    public class NodeQueue<T>
     {
         public int size;
         public Node<T> first;
@@ -32,6 +34,18 @@
                 ++size;
         }
 
+        public NodeQueue(T[] array)
+        {
+            first = last = null;
+            if (array.Length > 0)
+            {
+                first = last = new Node<T>(array[0], null);
+                for (int index = 0; index < array.Length; ++index)
+                    last = last.next = new Node<T>(array[index], null);
+            }
+            size = array.Length;
+        }
+
         public void Enque(T value)
         {
             Node<T> node = new Node<T>(value, null);
@@ -50,6 +64,44 @@
                 last = null;
             --size;
             return node.value;
+        }
+
+        public bool Find(Func<T, bool> predicat)
+        {
+            for (Node<T> node = first; node != null; node = node.next)
+                if (predicat(node.value))
+                    return true;
+            return false;
+        }
+
+        public ref T FindValue(Func<T, bool> predicat)
+        {
+            for (Node<T> node = first; node != null; node = node.next)
+                if (predicat(node.value))
+                    return ref node.value;
+            throw new Exception();
+        }
+
+        public void InsertIf(T value, Func<T, bool> predicat)
+        {
+            Node<T> prev = null;
+            Node<T> node = first;
+            while (node != null && !predicat(node.value))
+            {
+                prev = node;
+                node = node.next;
+            }
+
+            Node<T> newNode;
+            if (prev == null)
+                newNode = first = new Node<T>(value, first);
+            else
+                newNode = prev.next = new Node<T>(value, prev.next);
+
+            if (newNode.next == null)
+                last = newNode;
+
+            ++size;
         }
     }
 }

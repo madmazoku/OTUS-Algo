@@ -2,21 +2,22 @@
 
 namespace lesson._16.cs
 {
-    class BridgeEdges
+    class BridgeEdges<T>
+        where T : struct
     {
-        AdjancenceVector graph;
+        AdjancenceVector<T> graph;
 
         int order;
         int[] pre;
         int[] low;
 
-        NodeStack<(int, int)> stack;
+        NodeStack<(int, int, T)> stack;
 
-        (int, int)[] data;
+        EdgeArray<T> data;
 
-        public (int, int)[] Data { get { Build(); return data; } }
+        public EdgeArray<T> Data { get { Build(); return data; } }
 
-        public BridgeEdges(AdjancenceVector graph)
+        public BridgeEdges(AdjancenceVector<T> graph)
         {
             this.graph = graph;
 
@@ -26,7 +27,7 @@ namespace lesson._16.cs
 
             Array.Fill(pre, -1);
 
-            stack = new NodeStack<(int, int)>();
+            stack = new NodeStack<(int, int, T)>();
 
             data = null;
         }
@@ -40,24 +41,24 @@ namespace lesson._16.cs
                 if (pre[node] == -1)
                     DSF(node, -1);
 
-            data = Util.ListToArray(stack);
+            data = new EdgeArray<T>(graph.NodesCount, Util.ListToArray(stack));
         }
 
         void DSF(int node, int prevNode)
         {
             pre[node] = low[node] = order++;
 
-            int[] adjancentNodes = graph.Data[node];
+            (int, T)[] adjancentNodes = graph.Data[node];
             for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
             {
-                int adjancentNode = adjancentNodes[incendence];
+                (int adjancentNode, T edgeData) = adjancentNodes[incendence];
                 if (pre[adjancentNode] == -1)
                 {
                     DSF(adjancentNode, node);
                     if (low[node] > low[adjancentNode])
                         low[node] = low[adjancentNode];
                     if (low[adjancentNode] == pre[adjancentNode])
-                        stack.Push((node, adjancentNode));
+                        stack.Push((node, adjancentNode, edgeData));
                 }
                 else if (adjancentNode != prevNode)
                     if (low[node] > pre[adjancentNode])

@@ -2,9 +2,10 @@
 
 namespace lesson._16.cs
 {
-    class TarjanStrongConnected
+    class TarjanStrongConnected<T>
+        where T : struct
     {
-        AdjancenceVector graph;
+        AdjancenceVector<T> graph;
 
         int order;
         int[] pre;
@@ -17,7 +18,7 @@ namespace lesson._16.cs
 
         public int[][] Data { get { Build(); return data; } }
 
-        public TarjanStrongConnected(AdjancenceVector graph)
+        public TarjanStrongConnected(AdjancenceVector<T> graph)
         {
             this.graph = graph;
 
@@ -50,10 +51,10 @@ namespace lesson._16.cs
             int min = pre[node] = low[node] = order++;
             stack.Push(node);
 
-            int[] adjancentNodes = graph.Data[node];
+            (int, T)[] adjancentNodes = graph.Data[node];
             for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
             {
-                int adjancentNode = adjancentNodes[incendence];
+                (int adjancentNode, _) = adjancentNodes[incendence];
                 if (pre[adjancentNode] == -1)
                     DSF(adjancentNode);
                 if (min > low[adjancentNode])

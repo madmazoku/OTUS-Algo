@@ -1,6 +1,6 @@
 ﻿namespace lesson._16.cs
 {
-    class Node<T>
+    public class Node<T>
     {
         public T value;
         public Node<T> next;
