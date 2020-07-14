@@ -3,7 +3,7 @@ using System;
 
 namespace lesson._17.cs
 {
-    class QuickSort<T>
+    public class QuickSort<T>
     {
         static public void Sort(T[] array, Func<T, T, int> compare, int? from = null, int? to = null)
         {

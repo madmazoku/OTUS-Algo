@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>lesson._18.cs</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\lesson.16.cs\lesson.16.cs.csproj" />
+    <ProjectReference Include="..\lesson.17.cs\lesson.17.cs.csproj" />
+  </ItemGroup>
+
+</Project>
