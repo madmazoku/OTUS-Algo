@@ -42,6 +42,7 @@ namespace lesson._18.cs
             {
                 for (int adjancentNode = 0; adjancentNode < graph.NodesCount; ++adjancentNode)
                     data[node, adjancentNode] = (-1, double.MaxValue, double.MaxValue);
+                data[node, node] = (node, 0, 0);
 
                 (int, double)[] adjancentNodes = graph.Data[node];
                 for (int incendence = 0; incendence < adjancentNodes.Length; ++incendence)
