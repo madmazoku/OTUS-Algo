@@ -20,6 +20,7 @@ namespace lesson._19.cs
         Button _fullConnectionsBtnCtrl;
         Button _bruteforceBtnCtrl;
         Button _shortEdgeBtnCtrl;
+        Button _branchAndBoundBtnCtrl;
 
         GraphCtrl _graphCtrl;
 
@@ -73,6 +74,18 @@ namespace lesson._19.cs
             _distanceLabelCtrl.Text = $"Dist: {distance:g3}";
         }
 
+        private void branchAndBoundBtnCtrl_Click(object sender, EventArgs e)
+        {
+            Stopwatch sw = Stopwatch.StartNew();
+            _graphCtrl.Edges = (new BranchAndBoundTravel(_graphCtrl.Nodes)).Edges;
+            sw.Stop();
+            _timeLabelCtrl.Text = $"Time: {sw.Elapsed.TotalSeconds:g3}";
+            double distance = 0;
+            foreach (Edge edge in _graphCtrl.Edges)
+                distance += edge.distance;
+            _distanceLabelCtrl.Text = $"Dist: {distance:g3}";
+        }
+
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
@@ -95,6 +108,7 @@ namespace lesson._19.cs
             _fullConnectionsBtnCtrl = new Button();
             _bruteforceBtnCtrl = new Button();
             _shortEdgeBtnCtrl = new Button();
+            _branchAndBoundBtnCtrl = new Button();
 
             _graphCtrl.BorderStyle = BorderStyle.Fixed3D;
 
@@ -123,6 +137,9 @@ namespace lesson._19.cs
             _shortEdgeBtnCtrl.TextAlign = ContentAlignment.MiddleCenter;
             _shortEdgeBtnCtrl.Text = "Short Edge";
 
+            _branchAndBoundBtnCtrl.TextAlign = ContentAlignment.MiddleCenter;
+            _branchAndBoundBtnCtrl.Text = "Branch and Bound";
+
             Controls.Add(_graphCtrl);
             Controls.Add(_coordLabelCtrl);
             Controls.Add(_countLabelCtrl);
@@ -131,6 +148,7 @@ namespace lesson._19.cs
             Controls.Add(_fullConnectionsBtnCtrl);
             Controls.Add(_bruteforceBtnCtrl);
             Controls.Add(_shortEdgeBtnCtrl);
+            Controls.Add(_branchAndBoundBtnCtrl);
 
             _graphCtrl.MouseMove += new MouseEventHandler(graphCtrl_MouseMove);
             _graphCtrl.MouseUp += new MouseEventHandler(graphCtrl_MouseUp);
@@ -138,6 +156,7 @@ namespace lesson._19.cs
             _fullConnectionsBtnCtrl.Click += new EventHandler(fullConnectionsBtnCtrl_Click);
             _bruteforceBtnCtrl.Click += new EventHandler(bruteforceBtnCtrl_Click);
             _shortEdgeBtnCtrl.Click += new EventHandler(shortEdgeBtnCtrl_Click);
+            _branchAndBoundBtnCtrl.Click += new EventHandler(branchAndBoundBtnCtrl_Click);
 
             MinimumSize = new Size(_labelWidth * 3, _labelWidth * 2);
             ClientSize = new Size(_labelWidth * 3, _labelWidth * 2);
@@ -175,6 +194,9 @@ namespace lesson._19.cs
 
             _shortEdgeBtnCtrl.Location = new Point(minSize + 5, _labelHeight * 6 + 5);
             _shortEdgeBtnCtrl.Size = new Size(labelSize - 10, _labelHeight);
+
+            _branchAndBoundBtnCtrl.Location = new Point(minSize + 5, _labelHeight * 7 + 5);
+            _branchAndBoundBtnCtrl.Size = new Size(labelSize - 10, _labelHeight);
         }
 
     }
