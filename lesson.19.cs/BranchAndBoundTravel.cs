@@ -1,19 +1,16 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Windows;
 
 namespace lesson._19.cs
 {
     class BranchAndBoundTravel
     {
-        Node[] _nodes;
-        List<Edge> _edges;
+        GraphNode[] _nodes;
+        List<GraphEdge> _edges;
 
-        public List<Edge> Edges { get { Build(); return _edges; } }
+        public List<GraphEdge> Edges { get { Build(); return _edges; } }
 
-        public BranchAndBoundTravel(List<Node> nodes)
+        public BranchAndBoundTravel(List<GraphNode> nodes)
         {
             this._nodes = nodes.ToArray();
             _edges = null;
@@ -24,7 +21,7 @@ namespace lesson._19.cs
             if (_edges != null)
                 return;
 
-            _edges = new List<Edge>();
+            _edges = new List<GraphEdge>();
             if (_nodes.Length == 0)
                 return;
 
@@ -33,7 +30,7 @@ namespace lesson._19.cs
             for (int from = 0; from < _nodes.Length; ++from)
             {
                 for (int to = from + 1; to < _nodes.Length; ++to)
-                    adjancenceArray[from, to] = adjancenceArray[to, from] = Node.Distance(_nodes[from], _nodes[to]);
+                    adjancenceArray[from, to] = adjancenceArray[to, from] = GraphNode.Distance(_nodes[from], _nodes[to]);
                 adjancenceArray[from, from] = double.MaxValue;
             }
 
@@ -93,7 +90,7 @@ namespace lesson._19.cs
                     adjancenceArray[maxRow, i] = adjancenceArray[i, maxCol] = double.MaxValue;
                 adjancenceArray[maxRow, maxCol] = adjancenceArray[maxCol, maxRow] = double.MaxValue;
 
-                _edges.Add(new Edge(maxRow, maxCol, Node.Distance(_nodes[maxRow], _nodes[maxCol])));
+                _edges.Add(new GraphEdge(maxRow, maxCol, GraphNode.Distance(_nodes[maxRow], _nodes[maxCol])));
 
                 // 8) Если полный путь еще не найден, переходим к пункту 2, если найден к пункту 9.
             } while (_edges.Count != _nodes.Length);

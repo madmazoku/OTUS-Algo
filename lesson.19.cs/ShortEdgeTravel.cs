@@ -1,16 +1,17 @@
-﻿using System;
+﻿using lesson._17.cs;
+using System;
 using System.Collections.Generic;
 
 namespace lesson._19.cs
 {
     class ShortEdgeTravel
     {
-        Node[] _nodes;
-        List<Edge> _edges;
+        GraphNode[] _nodes;
+        List<GraphEdge> _edges;
 
-        public List<Edge> Edges { get { Build(); return _edges; } }
+        public List<GraphEdge> Edges { get { Build(); return _edges; } }
 
-        public ShortEdgeTravel(List<Node> nodes)
+        public ShortEdgeTravel(List<GraphNode> nodes)
         {
             this._nodes = nodes.ToArray();
             _edges = null;
@@ -21,15 +22,15 @@ namespace lesson._19.cs
             if (_edges != null)
                 return;
 
-            _edges = new List<Edge>();
+            _edges = new List<GraphEdge>();
             if (_nodes.Length == 0)
                 return;
 
-            Edge[] edges = new Edge[(_nodes.Length * (_nodes.Length - 1)) >> 1];
+            GraphEdge[] edges = new GraphEdge[(_nodes.Length * (_nodes.Length - 1)) >> 1];
             int cnt = 0;
             for (int from = 0; from < _nodes.Length - 1; ++from)
                 for (int to = from + 1; to < _nodes.Length; ++to)
-                    edges[cnt++] = new Edge(from, to, Node.Distance(_nodes[from], _nodes[to]));
+                    edges[cnt++] = new GraphEdge(from, to, GraphNode.Distance(_nodes[from], _nodes[to]));
 
             Array.Sort(edges, new EdgeComparer());
 
@@ -39,7 +40,7 @@ namespace lesson._19.cs
 
             for (int idx = 0; idx < edges.Length; ++idx)
             {
-                Edge edge = edges[idx];
+                GraphEdge edge = edges[idx];
                 if (uf.Groups > 1 && uf.HasOneRoot(edge.from, edge.to))
                     continue;
                 if (rank[edge.from] > 1 || rank[edge.to] > 1)

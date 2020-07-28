@@ -5,10 +5,10 @@ namespace lesson._19.cs
 {
     class BruteforceTravel
     {
-        Node[] _nodes;
-        List<Edge> _edges;
+        GraphNode[] _nodes;
+        List<GraphEdge> _edges;
 
-        public List<Edge> Edges { get { Build(); return _edges; } }
+        public List<GraphEdge> Edges { get { Build(); return _edges; } }
 
         double[,] _adjancenceArray;
         bool[] _visited;
@@ -19,7 +19,7 @@ namespace lesson._19.cs
         double _pathDistance;
         int[] _path;
 
-        public BruteforceTravel(List<Node> nodes)
+        public BruteforceTravel(List<GraphNode> nodes)
         {
             this._nodes = nodes.ToArray();
             _edges = null;
@@ -39,14 +39,14 @@ namespace lesson._19.cs
             if (_edges != null)
                 return;
 
-            _edges = new List<Edge>();
+            _edges = new List<GraphEdge>();
             if (_nodes.Length == 0)
                 return;
 
             _adjancenceArray = new double[_nodes.Length, _nodes.Length];
             for (int from = 0; from < _nodes.Length - 1; ++from)
                 for (int to = from + 1; to < _nodes.Length; ++to)
-                    _adjancenceArray[from, to] = _adjancenceArray[to, from] = Node.Distance(_nodes[from], _nodes[to]);
+                    _adjancenceArray[from, to] = _adjancenceArray[to, from] = GraphNode.Distance(_nodes[from], _nodes[to]);
 
             _visited = new bool[_nodes.Length];
 
@@ -62,12 +62,12 @@ namespace lesson._19.cs
             {
                 int from = _minPath[level];
                 int to = _minPath[level + 1];
-                _edges.Add(new Edge(from, to, _adjancenceArray[from, to]));
+                _edges.Add(new GraphEdge(from, to, _adjancenceArray[from, to]));
             }
             {
                 int from = _minPath[_nodes.Length - 1];
                 int to = _minPath[0];
-                _edges.Add(new Edge(from, to, _adjancenceArray[from, to]));
+                _edges.Add(new GraphEdge(from, to, _adjancenceArray[from, to]));
             }
         }
 

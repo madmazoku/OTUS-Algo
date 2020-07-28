@@ -1,6 +1,6 @@
 ﻿namespace lesson._17.cs
 {
-    class UnionFind
+    public class UnionFind
     {
         int[] root;
         int[] size;

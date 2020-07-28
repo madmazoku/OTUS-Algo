@@ -8,4 +8,9 @@
     <RootNamespace>lesson._19.cs</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\lesson.16.cs\lesson.16.cs.csproj" />
+    <ProjectReference Include="..\lesson.17.cs\lesson.17.cs.csproj" />
+  </ItemGroup>
+
 </Project>

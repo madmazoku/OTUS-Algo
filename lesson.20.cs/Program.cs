@@ -7,13 +7,14 @@ namespace lesson._20.cs
 
         static int Find_Native(string text, string pattern)
         {
-            for (int i = 0; i < text.Length - pattern.Length + 1; ++i) {
+            for (int i = 0; i < text.Length - pattern.Length + 1; ++i)
+            {
                 bool found = true;
-                for(int j = 0; j < pattern.Length; ++j)
-                    if(text[i+j] != pattern[j])
+                for (int j = 0; j < pattern.Length; ++j)
+                    if (text[i + j] != pattern[j])
                     {
-                            found = false;
-                            break;
+                        found = false;
+                        break;
                     }
                 if (found)
                     return i;
@@ -24,10 +25,10 @@ namespace lesson._20.cs
         static int Find_0(string text, string pattern)
         {
             int i = 0;
-            while(i < text.Length - pattern.Length + 1)
+            while (i < text.Length - pattern.Length + 1)
             {
                 int j = 0;
-                while(j < pattern.Length && text[i + j] == pattern[j])
+                while (j < pattern.Length && text[i + j] == pattern[j])
                     ++j;
                 if (j == pattern.Length)
                     return i;
@@ -51,17 +52,17 @@ namespace lesson._20.cs
             Array.Fill(suffixes, pattern.Length, 0, pattern.Length);
             suffixes[pattern.Length] = 1;
 
-            for(int i = pattern.Length - 1; i >= 0; --i)
+            for (int i = pattern.Length - 1; i >= 0; --i)
             {
-                for(int j = i; j < pattern.Length; ++j)
+                for (int j = i; j < pattern.Length; ++j)
                 {
                     string suffix = pattern.Substring(j);
-                    for(int k = j - 1; k >= 0; --k)
+                    for (int k = j - 1; k >= 0; --k)
                     {
                         string prefix = pattern.Substring(k, suffix.Length);
-                        if(suffix == prefix)
+                        if (suffix == prefix)
                         {
-                            suffixes[i] = j-k;
+                            suffixes[i] = j - k;
                             j = pattern.Length;
                             break;
                         }

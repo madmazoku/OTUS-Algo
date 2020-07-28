@@ -42,11 +42,11 @@ namespace lesson._19.cs
 
         private void fullConnectionsBtnCtrl_Click(object sender, EventArgs e)
         {
-            Node[] nodes = _graphCtrl.Nodes.ToArray();
-            List<Edge> edges = new List<Edge>();
+            GraphNode[] nodes = _graphCtrl.Nodes.ToArray();
+            List<GraphEdge> edges = new List<GraphEdge>();
             for (int from = 0; from < nodes.Length - 1; ++from)
                 for (int to = from + 1; to < nodes.Length; ++to)
-                    edges.Add(new Edge(from, to, Node.Distance(nodes[from], nodes[to])));
+                    edges.Add(new GraphEdge(from, to, GraphNode.Distance(nodes[from], nodes[to])));
             _graphCtrl.Edges = edges;
         }
 
@@ -57,7 +57,7 @@ namespace lesson._19.cs
             sw.Stop();
             _timeLabelCtrl.Text = $"Time: {sw.Elapsed.TotalSeconds:g3}";
             double distance = 0;
-            foreach (Edge edge in _graphCtrl.Edges)
+            foreach (GraphEdge edge in _graphCtrl.Edges)
                 distance += edge.distance;
             _distanceLabelCtrl.Text = $"Dist: {distance:g3}";
         }
@@ -69,7 +69,7 @@ namespace lesson._19.cs
             sw.Stop();
             _timeLabelCtrl.Text = $"Time: {sw.Elapsed.TotalSeconds:g3}";
             double distance = 0;
-            foreach (Edge edge in _graphCtrl.Edges)
+            foreach (GraphEdge edge in _graphCtrl.Edges)
                 distance += edge.distance;
             _distanceLabelCtrl.Text = $"Dist: {distance:g3}";
         }
@@ -81,7 +81,7 @@ namespace lesson._19.cs
             sw.Stop();
             _timeLabelCtrl.Text = $"Time: {sw.Elapsed.TotalSeconds:g3}";
             double distance = 0;
-            foreach (Edge edge in _graphCtrl.Edges)
+            foreach (GraphEdge edge in _graphCtrl.Edges)
                 distance += edge.distance;
             _distanceLabelCtrl.Text = $"Dist: {distance:g3}";
         }
