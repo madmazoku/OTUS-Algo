@@ -1,6 +1,8 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Windows;
 
 namespace lesson._19.cs
 {
@@ -26,6 +28,7 @@ namespace lesson._19.cs
             if (_nodes.Length == 0)
                 return;
 
+            // 1) Построение матрицы с исходными данными.
             double[,] adjancenceArray = new double[_nodes.Length, _nodes.Length];
             for (int from = 0; from < _nodes.Length; ++from)
             {
@@ -34,118 +37,68 @@ namespace lesson._19.cs
                 adjancenceArray[from, from] = double.MaxValue;
             }
 
-            //adjancenceArray = new double[6, 6] {
-            //    { 0,4,10,13,4,8 },
-            //    { 2, 0, 9, 7, 6, 7 } ,
-            //    { 8,5,0,5,5,9},
-            //    { 5,8,5,0,7,10},
-            //    { 6,4,4,9,0,4},
-            //    { 5,1,4,8,3, 0}
-            //};
-            //for (int i = 0; i < _nodes.Length; ++i)
-            //    adjancenceArray[i, i] = double.MaxValue;
-
-            double[] rows = new double[_nodes.Length];
-            double[] cols = new double[_nodes.Length];
-
-            List<(int, int, double)> estimates = new List<(int, int, double)>();
+            double[] minRowsDistance = new double[_nodes.Length];
+            double[] minColsDistance = new double[_nodes.Length];
 
             do
             {
-                // Нахождение минимума по строкам
-                Array.Fill(rows, double.MaxValue);
+                // 2) Нахождение минимума по строкам.
+                Array.Fill(minRowsDistance, double.MaxValue);
                 for (int row = 0; row < _nodes.Length; ++row)
                     for (int col = 0; col < _nodes.Length; ++col)
-                        if (adjancenceArray[row, col] != double.MaxValue && adjancenceArray[row, col] < rows[row])
-                            rows[row] = adjancenceArray[row, col];
+                        if (adjancenceArray[row, col] != double.MaxValue && minRowsDistance[row] > adjancenceArray[row, col])
+                            minRowsDistance[row] = adjancenceArray[row, col];
 
-                // Редукция строк
+                // 3) Редукция строк.
                 for (int row = 0; row < _nodes.Length; ++row)
                     for (int col = 0; col < _nodes.Length; ++col)
                         if (adjancenceArray[row, col] != double.MaxValue)
-                            adjancenceArray[row, col] -= rows[row];
+                            adjancenceArray[row, col] -= minRowsDistance[row];
 
-                // Нахождение минимума по столбцам.
-                Array.Fill(cols, double.MaxValue);
-                for (int col = 0; col < _nodes.Length; ++col)
-                    for (int row = 0; row < _nodes.Length; ++row)
-                        if (adjancenceArray[row, col] != double.MaxValue && adjancenceArray[row, col] < cols[col])
-                            cols[col] = adjancenceArray[row, col];
+                // 4) Нахождение минимума по столбцам
+                Array.Fill(minColsDistance, double.MaxValue);
+                for (int row = 0; row < _nodes.Length; ++row)
+                    for (int col = 0; col < _nodes.Length; ++col)
+                        if (adjancenceArray[row, col] != double.MaxValue && minColsDistance[col] > adjancenceArray[row, col])
+                            minColsDistance[col] = adjancenceArray[row, col];
 
-                // Редукция столбцов
-                for (int col = 0; col < _nodes.Length; ++col)
-                    for (int row = 0; row < _nodes.Length; ++row)
+                // 5) Редукция столбцов.
+                for (int row = 0; row < _nodes.Length; ++row)
+                    for (int col = 0; col < _nodes.Length; ++col)
                         if (adjancenceArray[row, col] != double.MaxValue)
-                            adjancenceArray[row, col] -= cols[col];
+                            adjancenceArray[row, col] -= minColsDistance[col];
 
-                // Вычисление оценок нулевых клеток
-                estimates.Clear();
+                // 6) Вычисление оценок нулевых клеток
+                (int maxRow, int maxCol, double maxEstimate) = (-1, -1, double.MinValue);
                 for (int row = 0; row < _nodes.Length; ++row)
                     for (int col = 0; col < _nodes.Length; ++col)
                         if (adjancenceArray[row, col] == 0)
                         {
-                            double minRowValue = double.MaxValue;
-                            double minColValue = double.MaxValue;
+                            double minRowDistance = double.MaxValue;
+                            double minColDistance = double.MaxValue;
                             for (int i = 0; i < _nodes.Length; ++i)
                             {
-                                if (i != row && adjancenceArray[i, col] != double.MaxValue && adjancenceArray[i, col] < minRowValue)
-                                    minRowValue = adjancenceArray[i, col];
-                                if (i != col && adjancenceArray[row, i] != double.MaxValue && adjancenceArray[row, i] < minColValue)
-                                    minColValue = adjancenceArray[row, i];
+                                if (i != col && adjancenceArray[row, i] != double.MaxValue && minRowDistance > adjancenceArray[row, i])
+                                    minRowDistance = adjancenceArray[row, i];
+                                if (i != row && adjancenceArray[i, col] != double.MaxValue && minColDistance > adjancenceArray[i, col])
+                                    minColDistance = adjancenceArray[i, col];
                             }
-                            estimates.Add((row, col, minRowValue + minColValue));
+                            double estimate = minRowDistance + minColDistance;
+                            if (maxEstimate < estimate)
+                                (maxRow, maxCol, maxEstimate) = (row, col, estimate);
                         }
 
-                // Редукция матрицы
-                (int minRow, int minCol, double maxEstimate) = (-1, -1, double.MinValue);
-                foreach ((int row, int col, double estimate) in estimates)
-                    if (estimate > maxEstimate)
-                        (minRow, minCol, maxEstimate) = (row, col, estimate);
+                // 7) Редукция матрицы.
                 for (int i = 0; i < _nodes.Length; ++i)
-                    adjancenceArray[minRow, i] = adjancenceArray[i, minCol] = double.MaxValue;
-                adjancenceArray[minCol, minRow] = double.MaxValue;
-                //for (int i = 0; i < _nodes.Length; ++i)
-                //    adjancenceArray[i, minRow] = adjancenceArray[minCol, i] = double.MaxValue;
-                //adjancenceArray[minRow, minCol] = double.MaxValue;
+                    adjancenceArray[maxRow, i] = adjancenceArray[i, maxCol] = double.MaxValue;
+                adjancenceArray[maxRow, maxCol] = adjancenceArray[maxCol, maxRow] = double.MaxValue;
 
-                _edges.Add(new Edge(minRow, minCol, Node.Distance(_nodes[minRow], _nodes[minCol])));
+                _edges.Add(new Edge(maxRow, maxCol, Node.Distance(_nodes[maxRow], _nodes[maxCol])));
 
+                // 8) Если полный путь еще не найден, переходим к пункту 2, если найден к пункту 9.
             } while (_edges.Count != _nodes.Length);
+
+            // 9) Вычисление итоговой длины пути и построение маршрута
         }
-
-        void ReduceRows(double[,] adjancenceArray)
-        {
-            double[] minRowDistance = new double[_nodes.Length];
-            Array.Fill(minRowDistance, double.MaxValue);
-
-            for (int row = 0; row < _nodes.Length; ++row)
-                for (int col = 0; col < _nodes.Length; ++col)
-                    if (adjancenceArray[row, col] != double.MaxValue && minRowDistance[row] > adjancenceArray[row, col])
-                        minRowDistance[row] = adjancenceArray[row, col];
-
-            for (int row = 0; row < _nodes.Length; ++row)
-                for (int col = 0; col < _nodes.Length; ++col)
-                    if (adjancenceArray[row, col] != double.MaxValue)
-                        adjancenceArray[row, col] -= minRowDistance[row];
-
-        }
-
-        void ReduceCols(double[,] adjancenceArray)
-        {
-            double[] minColDistance = new double[_nodes.Length];
-            Array.Fill(minColDistance, double.MaxValue);
-
-            for (int row = 0; row < _nodes.Length; ++row)
-                for (int col = 0; col < _nodes.Length; ++col)
-                    if (adjancenceArray[row, col] != double.MaxValue && minColDistance[col] > adjancenceArray[row, col])
-                        minColDistance[col] = adjancenceArray[row, col];
-
-            for (int row = 0; row < _nodes.Length; ++row)
-                for (int col = 0; col < _nodes.Length; ++col)
-                    if (adjancenceArray[row, col] != double.MaxValue)
-                        adjancenceArray[row, col] -= minColDistance[col];
-
-        }
-
     }
 }
