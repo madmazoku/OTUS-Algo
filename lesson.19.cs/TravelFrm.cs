@@ -77,7 +77,7 @@ namespace lesson._19.cs
         private void branchAndBoundBtnCtrl_Click(object sender, EventArgs e)
         {
             Stopwatch sw = Stopwatch.StartNew();
-            _graphCtrl.Edges = (new BranchAndBoundTravel(_graphCtrl.Nodes)).Edges;
+            _graphCtrl.Edges = (new BranchAndBound3Travel(_graphCtrl.Nodes)).Edges;
             sw.Stop();
             _timeLabelCtrl.Text = $"Time: {sw.Elapsed.TotalSeconds:g3}";
             double distance = 0;
