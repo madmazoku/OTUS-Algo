@@ -73,11 +73,15 @@ namespace lesson._19.cs
                     (int X2, int Y2) = ((int)(nodeArray[edge.to].x * ClientSize.Width), (int)(nodeArray[edge.to].y * ClientSize.Height));
                     e.Graphics.DrawLine(Pens.Red, X1, Y1, X2, Y2);
                 }
-            int cnt = 0;
             foreach (GraphNode node in nodes)
             {
                 (int X, int Y) = ((int)(node.x * ClientSize.Width), (int)(node.y * ClientSize.Height));
                 e.Graphics.FillRectangle(Brushes.Black, X - 5, Y - 5, 10, 10);
+            }
+            int cnt = 0;
+            foreach (GraphNode node in nodes)
+            {
+                (int X, int Y) = ((int)(node.x * ClientSize.Width), (int)(node.y * ClientSize.Height));
                 e.Graphics.DrawString($"{cnt}", font, Brushes.Blue, X + 5, Y + 5);
                 ++cnt;
             }

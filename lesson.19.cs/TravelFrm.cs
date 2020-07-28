@@ -178,13 +178,13 @@ namespace lesson._19.cs
             _coordLabelCtrl.Size = new Size(labelSize - 10, _labelHeight);
 
             _countLabelCtrl.Location = new Point(minSize + 5, _labelHeight + 5);
-            _countLabelCtrl.Size = new Size(labelSize - 5, _labelHeight);
+            _countLabelCtrl.Size = new Size(labelSize - 10, _labelHeight);
 
             _timeLabelCtrl.Location = new Point(minSize + 5, _labelHeight * 2 + 5);
-            _timeLabelCtrl.Size = new Size(labelSize - 5, _labelHeight);
+            _timeLabelCtrl.Size = new Size(labelSize - 10, _labelHeight);
 
             _distanceLabelCtrl.Location = new Point(minSize + 5, _labelHeight * 3 + 5);
-            _distanceLabelCtrl.Size = new Size(labelSize - 5, _labelHeight);
+            _distanceLabelCtrl.Size = new Size(labelSize - 10, _labelHeight);
 
             _fullConnectionsBtnCtrl.Location = new Point(minSize + 5, _labelHeight * 4 + 5);
             _fullConnectionsBtnCtrl.Size = new Size(labelSize - 10, _labelHeight);
