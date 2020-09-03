@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using System.Xml.Serialization;
+using System.Collections.Generic;
 
 namespace lesson._27.cs
 {
@@ -74,10 +74,129 @@ namespace lesson._27.cs
             Console.WriteLine(K);
         }
 
+        struct Warehouse
+        {
+            public int square;
+            public int col;
+            public int row;
+            public int width;
+            public int height;
+
+            public Warehouse(int square, int col, int row, int width, int height)
+            {
+                this.square = square;
+                this.col = col;
+                this.row = row;
+                this.width = width;
+                this.height = height;
+            }
+
+            public override string ToString()
+            {
+                return $"col: {col}; row: {row}; width: {width}; height: {height}; square: {square}";
+            }
+        };
+
+        //static void SmallWarehouse()
+        //{
+        //    int[] args = Console.ReadLine().Trim().Split(' ').Select(x => int.Parse(x)).ToArray();
+        //    int N = args[0];
+        //    int M = args[1];
+
+        //    int[] line = new int[N];
+        //    Warehouse warehouse = new Warehouse(0, -1, -1, 0, 0);
+        //    for (int row = 0; row < M; ++row)
+        //    {
+        //        int[] input = Console.ReadLine().Trim().Split(' ').Select(x => int.Parse(x)).ToArray();
+
+        //        for (int col = 0; col < N; ++col)
+        //            if (input[col] == 1)
+        //                line[col] = 0;
+        //            else
+        //                ++line[col];
+
+        //        for(int col = 0; col < N; ++col)
+        //        {
+        //            int hCurrent = line[col];
+        //            for(int col2 = col, w = 1; col2 < N; ++col2, ++w)
+        //            {
+        //                if (input[col] == 1)
+        //                    break;
+        //                if (hCurrent > line[col2])
+        //                    hCurrent = line[col2];
+        //                int s = w * hCurrent;
+        //                if (warehouse.square < s)
+        //                    warehouse = new Warehouse(s, col, row - hCurrent + 1, w, hCurrent);
+        //            }
+        //        }
+        //    }
+
+        //    Console.WriteLine(warehouse.ToString());
+        //}
+
+        static void SmallWarehouse()
+        {
+            int[] args = Console.ReadLine().Trim().Split(' ').Select(x => int.Parse(x)).ToArray();
+            int N = args[0];
+            int M = args[1];
+
+            int[] line = new int[N];
+            int[] left = new int[N];
+            int[] right = new int[N];
+            Stack<int> stack = new Stack<int>();
+            int sMax = 0;
+            for (int row = 0; row < M; ++row)
+            {
+                int[] input = Console.ReadLine().Trim().Split(' ').Select(x => int.Parse(x)).ToArray();
+
+                for (int col = 0; col < N; ++col)
+                    if (input[col] == 1)
+                        line[col] = 0;
+                    else
+                        ++line[col];
+
+                {
+                    for (int col = 0; col < N; ++col)
+                    {
+                        while (stack.Count > 0 && line[col] < line[stack.Peek()])
+                            right[stack.Pop()] = col - 1;
+                        if(line[col] > 0)
+                            stack.Push(col);
+                    }
+                    while (stack.Count > 0)
+                        right[stack.Pop()] = N - 1;
+                }
+
+                {
+                    for (int col = N-1; col >= 0; --col)
+                    {
+                        while (stack.Count > 0 && line[col] < line[stack.Peek()])
+                            left[stack.Pop()] = col + 1;
+                        if (line[col] > 0)
+                            stack.Push(col);
+                    }
+                    while (stack.Count > 0)
+                        left[stack.Pop()] = 0;
+                }
+
+                for (int col = 0; col < N; ++col)
+                    if(line[col] > 0)
+                    {
+                        int s = (right[col] - left[col] + 1) * line[col];
+                        if (sMax < s)
+                            sMax = s;
+                        // square: {s}; col: {left[col]}; row: {row - line[col] + 1}; width: {right[col] - left[col] + 1}; height: {line[col]}
+                    }
+            }
+
+            Console.WriteLine(sMax);
+        }
+
         static void Main(string[] args)
         {
-            // Peas();
-            FiveEight();
+            //Peas();
+            //FiveEight();
+            SmallWarehouse();
         }
     }
 }
