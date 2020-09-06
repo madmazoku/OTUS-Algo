@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace lesson._27.cs
 {
@@ -37,7 +37,7 @@ namespace lesson._27.cs
 
         static public void Peas()
         {
-            int[] args = Console.ReadLine().Split(new char[]{ '+', '/' }).Select(x => int.Parse(x)).ToArray();
+            int[] args = Console.ReadLine().Trim().Split(new char[] { '+', '/' }).Select(x => int.Parse(x)).ToArray();
             int n = args[0] * args[3] + args[2] * args[1];
             int d = args[1] * args[3];
             int g = GCD(n, d);
@@ -46,9 +46,21 @@ namespace lesson._27.cs
             Console.WriteLine($"{n}/{d}");
         }
 
+        static public void NumberFir()
+        {
+            int N = int.Parse(Console.ReadLine().Trim());
+            int[][] fir = new int[N][];
+            for (int row = 0; row < N; ++row)
+                fir[row] = Console.ReadLine().Trim().Split(' ').Select(x => int.Parse(x)).ToArray();
+            for (int row = N - 2; row >= 0; --row)
+                for (int col = 0; col < fir[row].Length; ++col)
+                    fir[row][col] += Math.Max(fir[row + 1][col], fir[row + 1][col + 1]);
+            Console.WriteLine(fir[0][0]);
+        }
+
         static public void FiveEight()
         {
-            long N = int.Parse(Console.ReadLine());
+            long N = long.Parse(Console.ReadLine().Trim());
             long K;
             if (N <= 0)
                 K = 0;
@@ -74,28 +86,61 @@ namespace lesson._27.cs
             Console.WriteLine(K);
         }
 
-        struct Warehouse
+        static public void Islands()
         {
-            public int square;
-            public int col;
-            public int row;
-            public int width;
-            public int height;
+            int N = int.Parse(Console.ReadLine());
+            int[][] matrix = new int[N][];
+            for (int row = 0; row < N; ++row)
+                matrix[row] = Console.ReadLine().Trim().Split(' ').Select(x => int.Parse(x)).ToArray();
 
-            public Warehouse(int square, int col, int row, int width, int height)
-            {
-                this.square = square;
-                this.col = col;
-                this.row = row;
-                this.width = width;
-                this.height = height;
-            }
+            Stack<int> stack = new Stack<int>();
+            int K = 0;
+            for (int row = 0; row < N; ++row)
+                for (int col = 0; col < N; ++col)
+                    if (matrix[row][col] == 1)
+                    {
+                        ++K;
+                        stack.Push(col); stack.Push(row);
+                        while(stack.Count > 0)
+                        {
+                            int y = stack.Pop();
+                            int x = stack.Pop();
+                            if (x >= 0 && x < N && y >= 0 && y < N && matrix[y][x] == 1)
+                            {
+                                matrix[y][x] = 0;
+                                stack.Push(x); stack.Push(y + 1);
+                                stack.Push(x + 1); stack.Push(y);
+                                stack.Push(x); stack.Push(y - 1);
+                                stack.Push(x - 1); stack.Push(y);
+                            }
+                        }
+                    }
 
-            public override string ToString()
-            {
-                return $"col: {col}; row: {row}; width: {width}; height: {height}; square: {square}";
-            }
-        };
+            Console.WriteLine(K);
+        }
+
+        //struct Warehouse
+        //{
+        //    public int square;
+        //    public int col;
+        //    public int row;
+        //    public int width;
+        //    public int height;
+
+        //    public Warehouse(int square, int col, int row, int width, int height)
+        //    {
+        //        this.square = square;
+        //        this.col = col;
+        //        this.row = row;
+        //        this.width = width;
+        //        this.height = height;
+        //    }
+
+        //    public override string ToString()
+        //    {
+        //        return $"col: {col}; row: {row}; width: {width}; height: {height}; square: {square}";
+        //    }
+        //};
 
         //static void SmallWarehouse()
         //{
@@ -160,7 +205,7 @@ namespace lesson._27.cs
                     {
                         while (stack.Count > 0 && line[col] < line[stack.Peek()])
                             right[stack.Pop()] = col - 1;
-                        if(line[col] > 0)
+                        if (line[col] > 0)
                             stack.Push(col);
                     }
                     while (stack.Count > 0)
@@ -168,7 +213,7 @@ namespace lesson._27.cs
                 }
 
                 {
-                    for (int col = N-1; col >= 0; --col)
+                    for (int col = N - 1; col >= 0; --col)
                     {
                         while (stack.Count > 0 && line[col] < line[stack.Peek()])
                             left[stack.Pop()] = col + 1;
@@ -180,7 +225,7 @@ namespace lesson._27.cs
                 }
 
                 for (int col = 0; col < N; ++col)
-                    if(line[col] > 0)
+                    if (line[col] > 0)
                     {
                         int s = (right[col] - left[col] + 1) * line[col];
                         if (sMax < s)
@@ -194,9 +239,12 @@ namespace lesson._27.cs
 
         static void Main(string[] args)
         {
+            Console.WriteLine("Dynamic Programming");
             //Peas();
+            //NumberFir();
             //FiveEight();
-            SmallWarehouse();
+            //Islands();
+            //SmallWarehouse();
         }
     }
 }
