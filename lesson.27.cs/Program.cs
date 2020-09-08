@@ -12,7 +12,7 @@ namespace lesson._27.cs
             //FiveEight.Do();
             //Islands.Do();
             //SmallWarehouse.Do();
-            BigWarehouse.Do();
+            //BigWarehouse.Do();
         }
     }
 }
