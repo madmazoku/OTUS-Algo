@@ -5,20 +5,30 @@ namespace lesson._32.cs
     class BloomFilter
     {
         static double ln2 = Math.Log(2);
+        static byte[] masks = new byte[] {
+            0b00000001,
+            0b00000010,
+            0b00000100,
+            0b00001000,
+            0b00010000,
+            0b00100000,
+            0b01000000,
+            0b10000000,
+        };
 
         UInt32 hashCount;
         UInt32 bitCount;
 
-        UInt64[] data;
+        byte[] data;
 
         public BloomFilter(int capacity, double errorRate)
         {
             hashCount = (UInt32)(Math.Ceiling(Math.Log(1.0 / errorRate)));
             bitCount = (UInt32)(Math.Ceiling(-capacity * Math.Log2(errorRate) / ln2));
-            data = new UInt64[1 + (bitCount >> 6)];
+            data = new byte[1 + (bitCount >> 3)];
         }
 
-        public UInt64 ByteSize() { return (UInt64)sizeof(UInt64) * (UInt64)data.Length; }
+        public int ByteSize() { return data.Length; }
 
         public void Add(string key)
         {
@@ -49,20 +59,20 @@ namespace lesson._32.cs
             return (UInt32)(((UInt64)0 + hash1 + k * hash2) % bitCount);
         }
 
-        (UInt32, UInt64) BitPosMask(UInt32 pos)
+        (UInt32, byte) BitPosMask(UInt32 pos)
         {
-            return (pos >> 6, 1ul << (int)(pos & 0x3f));
+            return (pos >> 3, masks[pos & 0x7]);
         }
 
         void SetBit(UInt32 hash)
         {
-            (UInt32 pos, UInt64 mask) = BitPosMask(hash);
+            (UInt32 pos, byte mask) = BitPosMask(hash);
             data[pos] |= mask;
         }
 
         bool CheckBit(UInt32 hash)
         {
-            (UInt32 pos, UInt64 mask) = BitPosMask(hash);
+            (UInt32 pos, byte mask) = BitPosMask(hash);
             return (data[pos] & mask) == mask;
         }
 

@@ -58,8 +58,8 @@ namespace lesson._32.cs
                 };
                 double errorRate = 0.1;
 
-                BloomFilter bf = new BloomFilter(wordPresent.Length, errorRate);
-                Console.WriteLine($"For capacity of {wordPresent.Length} keys with error rate {errorRate} there were {bf.ByteSize()} bytes allocated");
+                BloomFilter bf = new BloomFilter(wordPresent.Length << 1, errorRate);
+                Console.WriteLine($"For capacity of {wordPresent.Length + wordAbsent.Length} keys with error rate {errorRate} there were {bf.ByteSize()} bytes allocated");
 
                 foreach (string key in wordPresent)
                     bf.Add(key);
@@ -67,7 +67,8 @@ namespace lesson._32.cs
                 int truePositiveCount = 0;
                 int falsePositiveCount = 0;
 
-                Console.WriteLine("Present keys check:");
+                Console.WriteLine("");
+                Console.WriteLine($"Present keys check ({wordPresent.Length}):");
                 ConsoleColor foreground = Console.ForegroundColor;
                 foreach (string key in wordPresent)
                 {
@@ -83,7 +84,8 @@ namespace lesson._32.cs
                         Console.WriteLine($": false negative");
                 }
 
-                Console.WriteLine("Absent keys check:");
+                Console.WriteLine("");
+                Console.WriteLine($"Absent keys check ({wordAbsent.Length}):");
                 foreach (string key in wordAbsent)
                 {
                     Console.ForegroundColor = ConsoleColor.White;
@@ -99,7 +101,8 @@ namespace lesson._32.cs
                 }
 
                 double falsePositiveRate = (double)falsePositiveCount / (truePositiveCount + falsePositiveCount);
-                Console.WriteLine($"False positive rate: { 100.0 * falsePositiveRate,7:g3}%");
+                Console.WriteLine("");
+                Console.WriteLine($"False positive rate: { 100.0 * falsePositiveRate:g3}%");
 
                 Debug.Assert(truePositiveCount == wordPresent.Length, "no false negative for stored keys");
                 Debug.Assert(falsePositiveRate <= errorRate, "false positive rate inside requested range");
