@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 // https://leetcode.com/problems/spiral-matrix/
 
@@ -19,8 +17,8 @@ namespace lesson._29.cs
             int r = 0;
             int c = 0;
 
-            int[] deltaRow = {0, 1, 0, -1 };
-            int[] deltaCol = {1, 0, -1, 0 };
+            int[] deltaRow = { 0, 1, 0, -1 };
+            int[] deltaCol = { 1, 0, -1, 0 };
 
             int di = 0;
             bool[,] seen = new bool[R, C];

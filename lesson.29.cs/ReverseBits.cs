@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace lesson._29.cs
+﻿namespace lesson._29.cs
 {
     class ReverseBits
     {

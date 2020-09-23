@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
+using System.Net;
+using System.Text.RegularExpressions;
 
 namespace lesson._32.cs
 {
@@ -45,11 +50,11 @@ namespace lesson._32.cs
                 Debug.Assert(falsePositive <= UInt16.MaxValue * 0.1, "false existance check");
             }
             {
-                string[] wordPresent = new string[] { 
+                string[] wordPresent = new string[] {
                     "abound","abounds","abundance","abundant","accessable",
                     "bloom","blossom","bolster","bonny","bonus","bonuses",
                     "coherent","cohesive","colorful","comely","comfort",
-                    "gems","generosity","generous","generously","genial" 
+                    "gems","generosity","generous","generously","genial"
                 };
                 string[] wordAbsent = new string[] {
                     "bluff","cheater","hate","war","humanity",
@@ -110,10 +115,133 @@ namespace lesson._32.cs
             }
         }
 
+        static List<string> GetWordsIteratorFromZipURI(string uri)
+        {
+            WebClient wc = new WebClient();
+            byte[] data = wc.DownloadData(uri);
+            MemoryStream ms = new MemoryStream(data);
+            ZipArchive za = new ZipArchive(ms);
+            Stream stream = za.Entries[0].Open();
+            StreamReader reader = new StreamReader(stream);
+            Regex regex = new Regex(@"\b(\w+)\b", RegexOptions.Compiled);
+            List<string> words = new List<string>();
+            while (!reader.EndOfStream)
+            {
+                string line = reader.ReadLine().ToLower();
+                MatchCollection matches = regex.Matches(line);
+                foreach (Match match in matches)
+                    words.Add(match.Value);
+            }
+            return words;
+        }
+
+        static void HyperLogLogTest()
+        {
+            {
+                UInt64[] hashes = new UInt64[]
+                {
+                    0b01 + (0b101111 << 2),
+                    0b11 + (0b100010 << 2),
+                    0b10 + (0b111000 << 2),
+                    0b01 + (0b100011 << 2),
+                    0b01 + (0b010110 << 2),
+                    0b01 + (0b100000 << 2),
+                    0b01 + (0b110010 << 2),
+                    0b00 + (0b100100 << 2),
+                };
+                HyperLogLog hll = new HyperLogLog(2, 6);
+                foreach (UInt64 hash in hashes)
+                    hll.AddHash(hash);
+                int count = hll.Count;
+                Debug.Assert(count == 18, "check uniq count estimation");
+            }
+            {
+                Console.WriteLine("");
+
+                string[] sources = new string[] {
+                    "https://fanfics.me/download.php?fic=68682&format=txt",
+                    "https://fanfics.me/download.php?fic=84524&format=txt",
+                    "https://fanfics.me/download.php?fic=82401&format=txt",
+                    "https://fanfics.me/download.php?fic=87277&format=txt",
+                    "https://fanfics.me/download.php?fic=111618&format=txt",
+                    "https://fanfics.me/download.php?fic=50275&format=txt",
+                    "https://fanfics.me/download.php?fic=132592&format=txt",
+                    "full"
+                };
+
+                List<string>[] keyss = new List<string>[sources.Length];
+                for (int source = 0; source < sources.Length; ++source)
+                    keyss[source] = new List<string>();
+
+                Console.WriteLine($"Read test sources");
+                for (int source = 0; source < sources.Length - 1; ++source)
+                {
+                    Console.WriteLine($"Source: {sources[source]}");
+
+                    Stopwatch sw;
+
+                    sw = Stopwatch.StartNew();
+                    Console.Write($"\tRead...           ");
+                    keyss[source] = GetWordsIteratorFromZipURI(sources[source]);
+                    sw.Stop();
+                    Console.WriteLine($"spent: {sw.Elapsed.TotalSeconds}");
+
+                    sw = Stopwatch.StartNew();
+                    Console.Write($"\tAppend to full... ");
+                    keyss[keyss.Length - 1].AddRange(keyss[source]);
+                    sw.Stop();
+                    Console.WriteLine($"spent: {sw.Elapsed.TotalSeconds}");
+                }
+
+                Console.WriteLine("");
+                for (int source = 0; source < sources.Length; ++source)
+                {
+                    Console.WriteLine($"Source: {sources[source]}");
+
+                    Stopwatch sw;
+
+                    sw = Stopwatch.StartNew();
+                    Console.Write($"\tCount overalls...          ");
+                    int count = 0;
+                    foreach (string key in keyss[source])
+                        ++count;
+                    sw.Stop();
+                    Console.WriteLine($"spent: {sw.Elapsed.TotalSeconds}");
+
+                    sw = Stopwatch.StartNew();
+                    Console.Write($"\tCount real uniqs...        ");
+                    HashSet<string> uniqs = new HashSet<string>();
+                    foreach (string key in keyss[source])
+                        uniqs.Add(key);
+                    sw.Stop();
+                    Console.WriteLine($"spent: {sw.Elapsed.TotalSeconds}");
+
+                    sw = Stopwatch.StartNew();
+                    Console.Write($"\tCount approximate uniqs... ");
+                    HyperLogLog hll = new HyperLogLog(8, 12);
+                    foreach (string key in keyss[source])
+                        hll.Add(key);
+                    sw.Stop();
+                    Console.WriteLine($"spent: {sw.Elapsed.TotalSeconds}");
+
+                    double errorPercent = 100.0 * Math.Abs(uniqs.Count - hll.Count) / uniqs.Count;
+
+                    Console.WriteLine("");
+                    Console.WriteLine($"\tOverall count         : {count}");
+                    Console.WriteLine($"\tReal uniq count       : {uniqs.Count}");
+                    Console.WriteLine($"\tApproximate uniq count: {hll.Count}; error: { errorPercent:g3}%");
+                    Console.WriteLine("");
+
+                    Debug.Assert(errorPercent < 30, "check error ratio");
+                }
+            }
+        }
+
         static void Main(string[] args)
         {
             //Console.WriteLine("HyperLogLog/CountMin Sketch");
             BloomFilterTests();
+            HyperLogLogTest();
         }
     }
 }

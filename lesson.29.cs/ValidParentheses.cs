@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace lesson._29.cs
 {
@@ -19,7 +17,7 @@ namespace lesson._29.cs
         public bool Do(string s)
         {
             Stack<char> stack = new Stack<char>();
-            foreach(char c in s)
+            foreach (char c in s)
             {
                 if (IsOpen(c))
                     stack.Push(c);

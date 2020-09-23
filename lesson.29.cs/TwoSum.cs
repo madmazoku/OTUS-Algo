@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace lesson._29.cs
 {
@@ -12,7 +10,7 @@ namespace lesson._29.cs
             for (int i = 0; i < nums.Length; ++i)
             {
                 int j = -1;
-                if(dict.TryGetValue(target - nums[i], out j))
+                if (dict.TryGetValue(target - nums[i], out j))
                     return new int[] { j, i };
                 dict[nums[i]] = i;
             }
