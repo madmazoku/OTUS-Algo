@@ -115,7 +115,7 @@ namespace lesson._32.cs
             }
         }
 
-        static List<string> GetWordsIteratorFromZipURI(string uri)
+        static List<string> GetWordsListFromZipURI(string uri)
         {
             WebClient wc = new WebClient();
             byte[] data = wc.DownloadData(uri);
@@ -182,7 +182,7 @@ namespace lesson._32.cs
 
                     sw = Stopwatch.StartNew();
                     Console.Write($"\tRead...           ");
-                    keyss[source] = GetWordsIteratorFromZipURI(sources[source]);
+                    keyss[source] = GetWordsListFromZipURI(sources[source]);
                     sw.Stop();
                     Console.WriteLine($"spent: {sw.Elapsed.TotalSeconds}");
 
