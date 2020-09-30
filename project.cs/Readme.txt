@@ -1,0 +1,1 @@
+﻿Would be Solver for Sokoban levels
