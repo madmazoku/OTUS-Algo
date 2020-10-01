@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -8,33 +7,33 @@ namespace project.cs
     class SokobanEdit
     {
         string path;
-        byte width;
-        byte height;
+        int width;
+        int height;
 
-        bool[,] stones;
+        const int MAX_WIDTH_HEIGHT = 1 << 8;
+        const byte O_EMPTY = 0b0000;
+        const byte O_STONE = 0b0001;
+        const byte O_TARGET = 0b0010;
+        const byte O_BOX = 0b0100;
+        const byte O_PLAYER = 0b1000;
 
-        bool hasPlayer;
-        ushort playerXY;
-        List<ushort> targetBoxXYs;
-        List<ushort> currentBoxXYs;
+        byte[,] cells;
 
         byte cursorX;
         byte cursorY;
         string errorMsg;
         string statusMsg;
 
-        public SokobanEdit(byte width, byte height, string path)
+        public SokobanEdit(int width, int height, string path)
         {
+            if (width < 0 || width > MAX_WIDTH_HEIGHT || height < 0 || height > MAX_WIDTH_HEIGHT)
+                throw new Exception("Invalid size");
+
             this.path = path;
             this.width = width;
             this.height = height;
 
-            stones = new bool[width, height];
-
-            hasPlayer = false;
-            playerXY = 0;
-            targetBoxXYs = new List<ushort>();
-            currentBoxXYs = new List<ushort>();
+            cells = new byte[width, height];
 
             cursorX = 0;
             cursorY = 0;
@@ -45,108 +44,101 @@ namespace project.cs
                 ReadMap();
         }
 
+        const string VALID_MAP_CHARS = " .$*@+#";
+        bool IsValidMapLine(string line)
+        {
+            foreach (char c in line)
+                if (VALID_MAP_CHARS.IndexOf(c) == -1)
+                    return false;
+            return line.Length > 0;
+        }
+
         void ReadMap()
         {
-            string[] lines = File.ReadAllLines(path).Select(x => x.Trim()).Where(x => x.Length > 0).ToArray();
-            byte mapWidth = (byte)lines[0].Length;
+            string[] lines = File.ReadAllLines(path).Where(x => IsValidMapLine(x)).ToArray();
+            byte mapWidth = (byte)lines.Select(x => x.Length).Max();
             byte mapHeight = (byte)lines.Length;
 
             if (width < mapWidth || height < mapHeight)
                 throw new Exception("Too big map for load");
 
-            byte offsetX = (byte)((width - mapWidth) >> 1);
-            byte offsetY = (byte)((height - mapHeight) >> 1);
+            byte minX = (byte)((width - mapWidth) >> 1);
+            byte minY = (byte)((height - mapHeight) >> 1);
+            byte maxX = (byte)(minX + mapWidth);
+            byte maxY = (byte)(minY + mapHeight);
 
-            hasPlayer = false;
-            targetBoxXYs.Clear();
-            currentBoxXYs.Clear();
-
-            for (byte y = 0; y < mapHeight; ++y)
-                for (byte x = 0; x < mapWidth; ++x)
-                {
-                    byte ox = (byte)(x + offsetX);
-                    byte oy = (byte)(y + offsetY);
-                    switch (lines[y][x])
+            for (int y = 0; y < height; ++y)
+                for (int x = 0; x < width; ++x)
+                    if (y < minY || y >= maxY || x < minX || x >= lines[y - minY].Length + minX)
+                        cells[x, y] = O_EMPTY;
+                    else
                     {
-                        case 'S':
-                            stones[ox, oy] = true;
-                            break;
-                        case '.':
-                            stones[ox, oy] = false;
-                            break;
-                        default:
-                            ushort oxy = (ushort)((oy << 8) | ox);
-                            switch (lines[y][x])
-                            {
-                                case 'T':
-                                    targetBoxXYs.Add(oxy);
-                                    break;
-                                case 'B':
-                                    currentBoxXYs.Add(oxy);
-                                    break;
-                                case 'P':
-                                    hasPlayer = true;
-                                    playerXY = oxy;
-                                    break;
-                            }
-                            break;
+                        switch (lines[y - minY][x - minX])
+                        {
+                            case ' ': cells[x, y] = O_EMPTY; break;
+                            case '.': cells[x, y] = O_TARGET; break;
+                            case '$': cells[x, y] = O_BOX; break;
+                            case '*': cells[x, y] = O_BOX | O_TARGET; break;
+                            case '@': cells[x, y] = O_PLAYER; break;
+                            case '+': cells[x, y] = O_PLAYER | O_TARGET; break;
+                            case '#': cells[x, y] = O_STONE; break;
+                            default: break;
+                        }
                     }
-                }
         }
 
         void WriteMap()
         {
-            if (!hasPlayer)
-                throw new Exception("Player position not set");
-            if (targetBoxXYs.Count != currentBoxXYs.Count)
-                throw new Exception($"Number of targets ({targetBoxXYs.Count}) not match number of boxes ({currentBoxXYs.Count})");
+            int playerCount = 0;
+            int targetCount = 0;
+            int boxCount = 0;
 
-            byte minX = byte.MaxValue;
-            byte minY = byte.MaxValue;
-            byte maxX = 0;
-            byte maxY = 0;
+            int[] lineMaxXs = new int[height];
+            int minX = byte.MaxValue;
+            int minY = byte.MaxValue;
+            int maxX = 0;
+            int maxY = 0;
 
-            for (byte y = 0; y < height; ++y)
-                for (byte x = 0; x < width; ++x)
+
+            for (int y = 0; y < height; ++y)
+                for (int x = 0; x < width; ++x)
                 {
-                    bool touched;
-                    if (stones[x, y])
-                        touched = true;
-                    else
+                    byte cell = cells[x, y];
+                    if (cell != O_EMPTY)
                     {
-                        ushort xy = (ushort)((y << 8) | x);
-                        touched = (hasPlayer && playerXY == xy) || currentBoxXYs.Contains(xy) || targetBoxXYs.Contains(xy);
-                    }
-                    if (touched)
-                    {
+                        if (x > lineMaxXs[y]) lineMaxXs[y] = x;
                         if (x < minX) minX = x;
                         if (x > maxX) maxX = x;
                         if (y < minY) minY = y;
                         if (y > maxY) maxY = y;
                     }
+                    if ((cell & O_PLAYER) == O_PLAYER) ++playerCount;
+                    if ((cell & O_TARGET) == O_TARGET) ++targetCount;
+                    if ((cell & O_BOX) == O_BOX) ++boxCount;
                 }
+            if (playerCount != 1)
+                throw new Exception("Must be exact one player");
+            if (targetCount == 0 || boxCount == 0)
+                throw new Exception("Must be some target and boxes");
+            if (targetCount != boxCount)
+                throw new Exception("Must be the same number of target and boxes");
 
             string tmpPath = Path.ChangeExtension(path, "tmp");
             StreamWriter sw = File.CreateText(tmpPath);
-            for (byte y = minY; y <= maxY; ++y)
+            for (int y = minY; y <= maxY; ++y)
             {
-                for (byte x = minX; x <= maxX; ++x)
-                {
-                    if (stones[x, y])
-                        sw.Write('S');
-                    else
+                for (int x = minX; x <= lineMaxXs[y]; ++x)
+                    switch (cells[x, y])
                     {
-                        ushort xy = (ushort)((y << 8) | x);
-                        if (hasPlayer && playerXY == xy)
-                            sw.Write('P');
-                        else if (currentBoxXYs.Contains(xy))
-                            sw.Write('B');
-                        else if (targetBoxXYs.Contains(xy))
-                            sw.Write('T');
-                        else
-                            sw.Write('.');
+                        case O_EMPTY: sw.Write(' '); break;
+                        case O_TARGET: sw.Write('.'); break;
+                        case O_BOX: sw.Write('$'); break;
+                        case O_BOX | O_TARGET: sw.Write('*'); break;
+                        case O_PLAYER: sw.Write('@'); break;
+                        case O_PLAYER | O_TARGET: sw.Write('+'); break;
+                        case O_STONE: sw.Write('#'); break;
+                        default: break;
                     }
-                }
                 sw.Write("\n");
             }
 
@@ -156,7 +148,7 @@ namespace project.cs
             File.Move(tmpPath, path, true);
         }
 
-        byte SumWrap(int a, byte max, int d)
+        byte SumWrap(int a, int max, int d)
         {
             int o = d + a;
             while (o < 0)
@@ -168,112 +160,96 @@ namespace project.cs
 
         void Move(int dx, int dy)
         {
-            bool[,] stonesNew = new bool[width, height];
-            ushort playerXYNew = 0;
-            List<ushort> targetBoxXYsNew = new List<ushort>();
-            List<ushort> currentBoxXYsNew = new List<ushort>();
+            byte[,] cellsNew = new byte[width, height];
 
-            for (byte y = 0; y < height; ++y)
-                for (byte x = 0; x < width; ++x)
+            for (int y = 0; y < height; ++y)
+                for (int x = 0; x < width; ++x)
                 {
                     byte nx = SumWrap(x, width, dx);
                     byte ny = SumWrap(y, height, dy);
-                    stonesNew[nx, ny] = stones[x, y];
+                    cellsNew[nx, ny] = cells[x, y];
                 }
 
-            foreach (ushort xy in targetBoxXYs)
+            cells = cellsNew;
+        }
+
+        void Resize(int dx, int dy)
+        {
+            int widthNew = Math.Min(Math.Max(width + dx * 2, 0), MAX_WIDTH_HEIGHT);
+            int heightNew = Math.Min(Math.Max(height + dy * 2, 0), MAX_WIDTH_HEIGHT);
+
+            int sx = Math.Min(widthNew, width);
+            int sy = Math.Min(heightNew, height);
+
+            int dxN = Math.Max(dx, 0);
+            int dyN = Math.Max(dy, 0);
+
+            int dxO = Math.Max(-dx, 0);
+            int dyO = Math.Max(-dy, 0);
+
+            byte[,] cellsNew = new byte[widthNew, heightNew];
+
+            for (int y = 0; y < sy; ++y)
+                for (int x = 0; x < sx; ++x)
+                    cellsNew[x + dxN, y + dxN] = cells[x + dxO, y + dyO];
+
+            cells = cellsNew;
+            width = widthNew;
+            height = heightNew;
+        }
+
+        void SetStone(int x, int y)
+        {
+            if ((cells[x, y] & (O_BOX | O_PLAYER | O_TARGET)) == O_EMPTY)
+                cells[x, y] |= O_STONE;
+            else
+                throw new Exception("Can't set stone here");
+        }
+
+        void SetTarget(int x, int y)
+        {
+            if ((cells[x, y] & O_STONE) == O_EMPTY)
+                cells[x, y] |= O_TARGET;
+            else
+                throw new Exception("Can't set target here");
+        }
+
+        void SetBox(int x, int y)
+        {
+            if ((cells[x, y] & (O_STONE | O_PLAYER)) == O_EMPTY)
+                cells[x, y] |= O_BOX;
+            else
+                throw new Exception("Can't set box here");
+        }
+
+        void ErasePlayer()
+        {
+            for (int y = 0; y < width; ++y)
+                for (int x = 0; x < height; ++x)
+                    if ((cells[x, y] & O_PLAYER) != O_EMPTY)
+                    {
+                        cells[x, y] &= (byte)(~O_PLAYER & 0xff);
+                        return;
+                    }
+        }
+
+        void SetPlayer(int x, int y)
+        {
+            if ((cells[x, y] & (O_STONE | O_BOX)) == O_EMPTY)
             {
-                byte nx = SumWrap(xy & 0xff, width, dx);
-                byte ny = SumWrap(xy >> 8, height, dy);
-                targetBoxXYsNew.Add((ushort)((ny << 8) | nx));
+                ErasePlayer();
+                cells[x, y] |= O_PLAYER;
             }
-
-            foreach (ushort xy in currentBoxXYs)
-            {
-                byte nx = SumWrap(xy & 0xff, width, dx);
-                byte ny = SumWrap(xy >> 8, height, dy);
-                currentBoxXYsNew.Add((ushort)((ny << 8) | nx));
-            }
-
-            if (hasPlayer)
-            {
-                byte nx = SumWrap(playerXY & 0xff, width, dx);
-                byte ny = SumWrap(playerXY >> 8, height, dy);
-                playerXYNew = (ushort)((ny << 8) | nx);
-            }
-
-            stones = stonesNew;
-            playerXY = playerXYNew;
-            targetBoxXYs = targetBoxXYsNew;
-            currentBoxXYs = currentBoxXYsNew;
+            else
+                throw new Exception("Can't set player here");
         }
 
-        void SetStone(byte x, byte y)
+        void SetEmpty(int x, int y)
         {
-            ushort xy = (ushort)((y << 8) | x);
-            if (hasPlayer && playerXY == xy)
-                throw new Exception("Can't set stone, player here");
-            if (targetBoxXYs.Contains(xy))
-                throw new Exception("Can't set stone, target here");
-            if (currentBoxXYs.Contains(xy))
-                throw new Exception("Can't set stone, box here");
-            stones[x, y] = true;
+            cells[x, y] = O_EMPTY;
         }
 
-        void SetTarget(byte x, byte y)
-        {
-            ushort xy = (ushort)((y << 8) | x);
-            if (targetBoxXYs.Contains(xy))
-                return;
-            if (hasPlayer && playerXY == xy)
-                throw new Exception("Can't set target, player here");
-            if (stones[x, y])
-                throw new Exception("Can't set target, stone here");
-            if (currentBoxXYs.Contains(xy))
-                throw new Exception("Can't set target, box here");
-            targetBoxXYs.Add(xy);
-        }
-
-        void SetBox(byte x, byte y)
-        {
-            ushort xy = (ushort)((y << 8) | x);
-            if (currentBoxXYs.Contains(xy))
-                return;
-            if (stones[x, y])
-                throw new Exception("Can't set box, stone here");
-            if (hasPlayer && playerXY == xy)
-                throw new Exception("Can't set box, player here");
-            if (targetBoxXYs.Contains(xy))
-                throw new Exception("Can't set box, target here");
-            currentBoxXYs.Add(xy);
-        }
-
-        void SetPlayer(byte x, byte y)
-        {
-            ushort xy = (ushort)((y << 8) | x);
-            if (hasPlayer && playerXY == xy)
-                return;
-            if (stones[x, y])
-                throw new Exception("Can't set box, stone here");
-            if (targetBoxXYs.Contains(xy))
-                throw new Exception("Can't set stone, target here");
-            if (currentBoxXYs.Contains(xy))
-                throw new Exception("Can't set stone, box here");
-            playerXY = xy;
-            hasPlayer = true;
-        }
-
-        void SetEmpty(byte x, byte y)
-        {
-            ushort xy = (ushort)((y << 8) | x);
-            if (hasPlayer && playerXY == xy)
-                hasPlayer = false;
-            stones[x, y] = false;
-            targetBoxXYs.Remove(xy);
-            currentBoxXYs.Remove(xy);
-        }
-
-        void FillPlace(ConsoleColor fc, char c)
+        void FillCell(ConsoleColor fc, char c)
         {
             Console.ForegroundColor = fc;
             Console.Write(c);
@@ -282,18 +258,20 @@ namespace project.cs
 
         static string[] legend = {
             "Legend:",
-            "\tMovement control",
-            "\t\tArrow keys: move cursor",
-            "\t\tCapsLock + Arrow keys: shift map",
-            "\tFill cell",
-            "\t\tSpacebar: erase",
-            "\t\tS: stone",
-            "\t\tB: box",
-            "\t\tT: target for box",
-            "\t\tP: player",
-            "\tStorage",
-            "\t\tR: read",
-            "\t\tW: write"
+            "  Map control",
+            "    Numpad Arrow keys: move cursor",
+            "    CapsLock + Numpad Arrow keys: shift map",
+            "    +: enlarge map",
+            "    -: shrink map",
+            "  Fill cell",
+            "    Spacebar: erase",
+            "    S: stone",
+            "    B: box",
+            "    T: target for box",
+            "    P: player",
+            "  Storage",
+            "    R: read",
+            "    W: write"
         };
 
         void Render()
@@ -307,46 +285,53 @@ namespace project.cs
             }
 
             Console.SetCursorPosition(0, 0);
-            for (byte y = 0; y < height; ++y)
+            for (int y = 0; y < height; ++y)
             {
-                for (byte x = 0; x < width; ++x)
+                for (int x = 0; x < width; ++x)
                 {
-                    if (stones[x, y])
-                        FillPlace(ConsoleColor.Gray, 'S');
+                    byte cell = cells[x, y];
+                    if (cell == O_STONE)
+                    {
+                        Console.BackgroundColor = ConsoleColor.DarkBlue;
+                        FillCell(ConsoleColor.Gray, 'S');
+                        Console.BackgroundColor = ConsoleColor.Black;
+                    }
                     else
                     {
-                        ushort xy = (ushort)((y << 8) | x);
-                        if (hasPlayer && playerXY == xy)
-                            FillPlace(ConsoleColor.Red, 'P');
-                        else if (currentBoxXYs.Contains(xy))
-                            FillPlace(ConsoleColor.Yellow, 'B');
-                        else if (targetBoxXYs.Contains(xy))
-                            FillPlace(ConsoleColor.DarkYellow, 'T');
+                        if ((cell & O_TARGET) == O_TARGET)
+                            Console.BackgroundColor = ConsoleColor.DarkYellow;
+
+                        if ((cell & O_BOX) == O_BOX)
+                            FillCell(ConsoleColor.Yellow, 'B');
+                        else if ((cell & O_PLAYER) == O_PLAYER)
+                            FillCell(ConsoleColor.Red, 'P');
                         else
-                            FillPlace(ConsoleColor.DarkGray, '.');
+                            FillCell(ConsoleColor.Gray, '.');
+
+                        if ((cell & O_TARGET) == O_TARGET)
+                            Console.BackgroundColor = ConsoleColor.Black;
+
                     }
                 }
                 Console.Write("\n");
             }
             Console.Write('\n');
 
-            Console.SetCursorPosition(0, height + 1);
             if (errorMsg.Length > 0)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write(errorMsg.Substring(0, Math.Min(errorMsg.Length, Console.BufferWidth)).PadRight(Console.BufferWidth));
+                Console.WriteLine(errorMsg.Substring(0, Math.Min(errorMsg.Length, Console.BufferWidth)).PadRight(Console.BufferWidth));
             }
             else
-                Console.Write(errorMsg.PadRight(Console.BufferWidth));
+                Console.WriteLine(errorMsg.PadRight(Console.BufferWidth));
 
-            Console.SetCursorPosition(0, height + 2);
             if (statusMsg.Length > 0)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write(statusMsg.Substring(0, Math.Min(statusMsg.Length, Console.BufferWidth)).PadRight(Console.BufferWidth));
+                Console.WriteLine(statusMsg.Substring(0, Math.Min(statusMsg.Length, Console.BufferWidth)).PadRight(Console.BufferWidth));
             }
             else
-                Console.Write(statusMsg.PadRight(Console.BufferWidth));
+                Console.WriteLine(statusMsg.PadRight(Console.BufferWidth));
 
             Console.SetCursorPosition(cursorX << 1, cursorY);
 
@@ -354,11 +339,11 @@ namespace project.cs
             Console.CursorVisible = true;
         }
 
-        public void Run()
+        void UpdateWindowSize()
         {
-            Console.Title = "Sokoban: Start Edit mode";
+            int legentLength = legend.Select(x => x.Length).Max();
 
-            int newWidth = (width << 1) + 50;
+            int newWidth = (width << 1) + legentLength + 4;
             int newHeight = height + 4;
 
             if (newWidth > Console.BufferWidth)
@@ -370,48 +355,70 @@ namespace project.cs
                 Console.WindowHeight = Console.BufferHeight = newHeight;
             else
                 Console.BufferHeight = Console.WindowHeight = newHeight;
+        }
+
+        public void Run()
+        {
+            Console.Title = "Sokoban: Enter Edit mode";
+
+            UpdateWindowSize();
 
             while (true)
             {
                 Render();
 
-                ConsoleKeyInfo cki = Console.ReadKey();
+                ConsoleKeyInfo cki = Console.ReadKey(true);
                 if (cki.Key == ConsoleKey.Escape)
                     break;
 
                 errorMsg = "";
+                statusMsg = "";
 
                 try
                 {
                     switch (cki.Key)
                     {
-                        case ConsoleKey.LeftArrow:
-                            if (Console.CapsLock)
+                        case ConsoleKey.NumPad4:
+                            //case ConsoleKey.LeftArrow:
+                            if ((cki.Modifiers & ConsoleModifiers.Control) != 0)
                                 Move(-1, 0);
                             else if (cursorX > 0)
                                 --cursorX;
                             statusMsg = "Moved left";
                             break;
-                        case ConsoleKey.RightArrow:
-                            if (Console.CapsLock)
+                        case ConsoleKey.NumPad6:
+                            //case ConsoleKey.RightArrow:
+                            if ((cki.Modifiers & ConsoleModifiers.Control) != 0)
                                 Move(1, 0);
                             else if (cursorX < width - 1)
                                 ++cursorX;
                             statusMsg = "Moved right";
                             break;
-                        case ConsoleKey.UpArrow:
-                            if (Console.CapsLock)
+                        case ConsoleKey.NumPad8:
+                            //case ConsoleKey.UpArrow:
+                            if ((cki.Modifiers & ConsoleModifiers.Control) != 0)
                                 Move(0, -1);
                             else if (cursorY > 0)
                                 --cursorY;
                             statusMsg = "Moved up";
                             break;
-                        case ConsoleKey.DownArrow:
-                            if (Console.CapsLock)
+                        case ConsoleKey.NumPad2:
+                            //case ConsoleKey.DownArrow:
+                            if ((cki.Modifiers & ConsoleModifiers.Control) != 0)
                                 Move(0, 1);
                             else if (cursorY < height - 1)
                                 ++cursorY;
                             statusMsg = "Moved down";
+                            break;
+                        case ConsoleKey.Add:
+                            Resize(1, 1);
+                            statusMsg = "Map enlarged";
+                            UpdateWindowSize();
+                            break;
+                        case ConsoleKey.Subtract:
+                            Resize(-1, -1);
+                            statusMsg = "Map shrinked";
+                            UpdateWindowSize();
                             break;
                         case ConsoleKey.S:
                             SetStone(cursorX, cursorY);

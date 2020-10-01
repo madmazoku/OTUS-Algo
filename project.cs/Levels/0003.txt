@@ -1,0 +1,21 @@
+    #####
+   ##   #
+ ###    #
+##   $ ##
+#@.*** #
+#    * #
+########
+Author: GRIGoRusha
+Title: Samogonka #99
+Comment:
+color red
+Comment-End:
+
+Legend:
+  Space  	floor / corridor
+  .	target square
+  $	box
+  *	box on target square
+  @	SokoMind pusher
+  +	SokoMind pusher on target square
+  #	wall

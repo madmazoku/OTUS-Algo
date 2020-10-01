@@ -41,8 +41,11 @@ namespace project.cs
         {
             string levelDirectory = FindLevelDirectory();
 
-            SokobanEdit se = new SokobanEdit(32, 32, Path.Combine(levelDirectory, "0001.txt"));
-            se.Run();
+            //SokobanEdit se = new SokobanEdit(32, 32, Path.Combine(levelDirectory, "0004.txt"));
+            //se.Run();
+
+            SokobanPlay sp = new SokobanPlay(Path.Combine(levelDirectory, "0004.txt"));
+            sp.Run();
         }
     }
 }
