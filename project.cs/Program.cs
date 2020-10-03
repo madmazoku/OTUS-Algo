@@ -44,8 +44,11 @@ namespace project.cs
             //SokobanEdit se = new SokobanEdit(32, 32, Path.Combine(levelDirectory, "0004.txt"));
             //se.Run();
 
-            SokobanPlay sp = new SokobanPlay(Path.Combine(levelDirectory, "0004.txt"));
-            sp.Run();
+            //SokobanPlay sp = new SokobanPlay(Path.Combine(levelDirectory, "0004.txt"));
+            //sp.Run();
+
+            SokobanSolver ss = new SokobanSolver(Path.Combine(levelDirectory, "0004.txt"));
+            ss.Run();
         }
     }
 }
