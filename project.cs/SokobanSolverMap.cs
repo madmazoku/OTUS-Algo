@@ -50,6 +50,19 @@ namespace project.cs
             ReadMap(path);
         }
 
+        public void XY2Pos(ushort xy, out int x, out int y, out int pos)
+        {
+            x = xy & 0xff;
+            y = xy >> 8;
+            pos = x + y * width;
+        }
+
+        public void XY2Pos(ushort xy, out int x, out int y)
+        {
+            x = xy & 0xff;
+            y = xy >> 8;
+        }
+
         const string VALID_MAP_CHARS = " .$*@+#";
         bool IsValidMapLine(string line)
         {

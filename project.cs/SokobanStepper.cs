@@ -10,15 +10,15 @@ namespace project.cs
         SokobanSolverMap map;
 
         BitArray boxes;
-        BitArray accessible;
 
         int newStatesCount;
         ushort[][] newStates;
         ushort[] accessXYs;
-        bool[] avaliable;
 
-        int exploreCount;
-        ushort[] explore;
+        FixedQueue<ushort> explore;
+        int[] explored;
+        int[] distance;
+        int[] order;
 
         ushort[] state;
 
@@ -27,15 +27,15 @@ namespace project.cs
             this.map = new SokobanSolverMap(map);
 
             boxes = new BitArray(map.width * map.height);
-            accessible = new BitArray(map.width * map.height);
 
             newStatesCount = 0;
             newStates = new ushort[map.boxesCount * 4][];
             accessXYs = new ushort[map.boxesCount * 4];
-            avaliable = new bool[map.boxesCount * 4];
 
-            exploreCount = 0;
-            explore = new ushort[map.width * map.height];
+            explore = new FixedQueue<ushort>(map.width * map.height);
+            explored = new int[map.width * map.height];
+            distance = new int[map.boxesCount * 4];
+            order = new int[map.boxesCount * 4];
 
             state = null;
         }
@@ -53,6 +53,7 @@ namespace project.cs
             {
                 isStone = true;
                 isOccupied = true;
+                return;
             }
 
             int pos = x + y * map.width;
@@ -77,7 +78,7 @@ namespace project.cs
 
             newStates[newStatesCount] = newState;
             accessXYs[newStatesCount] = (ushort)(accessX | (accessY << 8));
-            avaliable[newStatesCount] = false;
+            distance[newStatesCount] = -1;
 
             ++newStatesCount;
         }
@@ -146,41 +147,36 @@ namespace project.cs
             return true;
         }
 
-        void Explore(int x, int y)
+        void Explore(int x, int y, int dist)
         {
             if (x < 0 || x >= map.width || y < 0 || y >= map.height)
                 return;
             int pos = x + y * map.width;
-            if (map.stones.Get(pos) || boxes.Get(pos) || accessible.Get(pos))
+            if (map.stones.Get(pos) || boxes.Get(pos) || explored[pos] != -1)
                 return;
-            explore[exploreCount++] = (ushort)(x | (y << 8));
-            accessible.Set(pos, true);
+            explore.Enqueue((ushort)(x | (y << 8)));
+            explored[pos] = dist;
         }
 
         void FillAccess()
         {
-            accessible.SetAll(false);
-            exploreCount = 0;
+            Array.Fill(explored, -1);
+            explore.Clear();
 
+            Explore(state[map.boxesCount] & 0xff, state[map.boxesCount] >> 8, 0);
+
+            while (explore.Count > 0)
             {
-                ushort xy = state[map.boxesCount];
+                ushort xy = explore.Dequeue();
                 int x = xy & 0xff;
                 int y = xy >> 8;
                 int pos = x + y * map.width;
-                explore[exploreCount++] = state[map.boxesCount];
-                accessible.Set(pos, true);
-            }
+                int dist = explored[pos] + 1;
 
-            while (exploreCount > 0)
-            {
-                ushort xy = explore[--exploreCount];
-                int x = xy & 0xff;
-                int y = xy >> 8;
-
-                Explore(x - 1, y);
-                Explore(x + 1, y);
-                Explore(x, y - 1);
-                Explore(x, y + 1);
+                Explore(x-1, y, dist);
+                Explore(x+1, y, dist);
+                Explore(x, y-1, dist);
+                Explore(x, y+1, dist);
             }
         }
 
@@ -192,16 +188,16 @@ namespace project.cs
                 int x = xy & 0xff;
                 int y = xy >> 8;
                 int pos = x + y * map.width;
-                avaliable[i] = accessible.Get(pos);
+                distance[i] = explored[pos];
+                order[i] = i;
             }
+            Array.Sort(distance, order, 0, newStatesCount);
         }
 
         public void Next(ushort[] state)
         {
             this.state = state;
             FillBoxes();
-
-            Render();
 
             if (!FillStatesNew())
                 return;
@@ -213,91 +209,19 @@ namespace project.cs
         public void Queue(Dictionary<ushort[], ushort[]> moves, Queue<ushort[]> states)
         {
             for (int i = 0; i < newStatesCount; ++i)
-                if (avaliable[i])
+                if (distance[i] != -1)
                 {
-                    if (!moves.ContainsKey(newStates[i]))
+                    ushort[] newState = newStates[order[i]];
+                    if (!moves.ContainsKey(newState))
                     {
-                        moves.Add(newStates[i], state);
-                        states.Enqueue(newStates[i]);
+                        moves.Add(newState, state);
+                        states.Enqueue(newState);
                     }
                     else
                     {
                         Console.Write("");
                     }
                 }
-        }
-
-        void DrawCell(int x, int y)
-        {
-            int pos = x + y * map.width;
-            if (map.stones.Get(pos))
-            {
-                Console.BackgroundColor = ConsoleColor.DarkBlue;
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("S ");
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.BackgroundColor = ConsoleColor.Black;
-            }
-            else
-            {
-                ushort xy = (ushort)((y << 8) | x);
-                bool isTarget = map.targets.Get(pos);
-
-                if (isTarget)
-                    Console.BackgroundColor = ConsoleColor.DarkYellow;
-
-                if (boxes.Get(pos))
-                {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write("B ");
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                }
-                else if (state[map.boxesCount] == xy)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write("P ");
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.Write(". ");
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                }
-
-                if (isTarget)
-                    Console.BackgroundColor = ConsoleColor.Black;
-            }
-        }
-
-        static int cnt = 0;
-        public void Render()
-        {
-            if (++cnt < 100000)
-                return;
-            cnt = 0;
-            Console.SetCursorPosition(0, 1);
-            for (int y = 0; y < map.height; ++y)
-            {
-                for (int x = 0; x < map.width; ++x)
-                    DrawCell(x, y);
-                Console.WriteLine("");
-            }
-        }
-
-        public void RenderAccess()
-        {
-            cnt = 0;
-            Console.SetCursorPosition(0, 1);
-            Console.ForegroundColor = ConsoleColor.White;
-            for (int y = 0; y < map.height; ++y)
-                for (int x = 0; x < map.width; ++x)
-                    if(accessible.Get(x + y * map.width))
-                    {
-                        Console.SetCursorPosition((x << 1) + 1, y + 1);
-                        Console.Write('+');
-                    }
-            Console.ForegroundColor = ConsoleColor.Gray;
         }
 
     }
