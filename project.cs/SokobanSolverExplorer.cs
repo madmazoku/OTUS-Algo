@@ -11,27 +11,25 @@ namespace project.cs
 
         ushort[] state;
 
-        BitArray boxes;
+        public BitArray boxes;
+        public int[] distance;
+        public ushort[] backtrace;
 
         FixedQueue<ushort> explore;
-        int[] distance;
-        ushort[] backtrace;
-
         FixedStack<ushort> path;
 
         public SokobanSolverExplorer(SokobanSolverMap map)
         {
             this.map = map;
 
-            int size = map.width * map.height;
+            state = null;
 
-            boxes = new BitArray(size);
+            boxes = new BitArray(map.size);
+            distance = new int[map.size];
+            backtrace = new ushort[map.size];
 
-            explore = new FixedQueue<ushort>(size);
-            distance = new int[size];
-            backtrace = new ushort[size];
-
-            path = new FixedStack<ushort>(size);
+            explore = new FixedQueue<ushort>(map.size);
+            path = new FixedStack<ushort>(map.size);
         }
 
         public void SetState(ushort[] state)
@@ -40,23 +38,17 @@ namespace project.cs
 
             boxes.SetAll(false);
             for (int i = 0; i < map.boxesCount; ++i)
-            {
-                ushort xy = state[i];
-                int x = xy & 0xff;
-                int y = xy >> 8;
-                int pos = x + y * map.width;
-                boxes.Set(pos, true);
-            }
+                boxes.Set(map.XY2Pos(state[i]), true);
         }
 
         void ExploreNext(int x, int y, ushort prevXY, int newDist)
         {
             if (x < 0 || x >= map.width || y < 0 || y >= map.height)
                 return;
-            int pos = x + y * map.width;
+            int pos = map.XY2Pos(x, y);
             if (map.stones.Get(pos) || boxes.Get(pos) || distance[pos] != -1)
                 return;
-            explore.Enqueue((ushort)(x | (y << 8)));
+            explore.Enqueue(map.Pos2XY(x,y));
             distance[pos] = newDist;
             backtrace[pos] = prevXY;
         }
@@ -66,9 +58,7 @@ namespace project.cs
             Array.Fill(distance, -1);
 
             ushort xy = state[map.boxesCount];
-            int x = xy & 0xff;
-            int y = xy >> 8;
-            int pos = x + y * map.width;
+            int pos = map.XY2Pos(xy);
 
             explore.Clear();
             explore.Enqueue(xy);
@@ -93,12 +83,31 @@ namespace project.cs
             }
         }
 
+        public void CheckCell(int x, int y, out bool isStone, out bool isOccupied)
+        {
+            if (x < 0 || y < 0 || x >= map.width || y >= map.height)
+            {
+                isStone = true;
+                isOccupied = true;
+                return;
+            }
+
+            int pos = map.XY2Pos(x,y);
+            isStone = map.stones.Get(pos);
+            isOccupied = isStone || boxes.Get(pos);
+        }
+
+        public bool IsOccupied(int x, int y)
+        {
+            if (x < 0 || y < 0 || x >= map.width || y >= map.height)
+                return true;
+            int pos = map.XY2Pos(x, y);
+            return map.stones.Get(pos) || boxes.Get(pos);
+        }
+
         public int GetDistance(ushort xy)
         {
-            int x = xy & 0xff;
-            int y = xy >> 8;
-            int pos = x + y * map.width;
-            return distance[pos];
+            return distance[map.XY2Pos(xy)];
         }
 
         public ushort[] GetPath(ushort toXY)
@@ -107,16 +116,12 @@ namespace project.cs
             ushort xy = toXY;
             path.Clear();
 
-            int x, y, pos;
             while(true)
             {
                 path.Push(xy);
                 if (xy == playerXY)
                     break;
-                map.XY2Pos(xy, out x, out y, out pos);
-                if (distance[pos] == -1)
-                    throw new Exception("broken path");
-                xy = backtrace[pos];
+                xy = backtrace[map.XY2Pos(xy)];
             }
 
             return path.ToArray();

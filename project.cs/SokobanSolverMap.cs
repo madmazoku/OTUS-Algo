@@ -12,6 +12,7 @@ namespace project.cs
 
         string path;
 
+        public int size;
         public int width;
         public int height;
         public int boxesCount;
@@ -28,6 +29,7 @@ namespace project.cs
         {
             path = map.path;
 
+            size = map.size;
             width = map.width;
             height = map.height;
             boxesCount = map.boxesCount;
@@ -63,6 +65,21 @@ namespace project.cs
             y = xy >> 8;
         }
 
+        public int XY2Pos(int x, int y)
+        {
+            return x + y * width;
+        }
+
+        public ushort Pos2XY(int x, int y)
+        {
+            return (ushort)(x | (y << 8));
+        }
+
+        public int XY2Pos(ushort xy)
+        {
+            return (xy & 0xff) + (xy >> 8) * width;
+        }
+
         const string VALID_MAP_CHARS = " .$*@+#";
         bool IsValidMapLine(string line)
         {
@@ -82,6 +99,7 @@ namespace project.cs
 
             if (width > MAX_WIDTH_HEIGHT || height > MAX_WIDTH_HEIGHT)
                 throw new Exception("Too big map");
+            size = width * height;
 
             stones = new BitArray(width * height);
             boxes = new BitArray(width * height);
