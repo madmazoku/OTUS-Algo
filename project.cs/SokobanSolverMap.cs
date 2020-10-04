@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,7 +7,12 @@ namespace project.cs
 {
     class SokobanSolverMap
     {
-        const int MAX_WIDTH_HEIGHT = 1 << 8;
+        public const int MAX_WIDTH_HEIGHT = 1 << 8;
+        public const byte O_EMPTY = 0b0000;
+        public const byte O_STONE = 0b0001;
+        public const byte O_TARGET = 0b0010;
+        public const byte O_BOX = 0b0100;
+        public const byte O_PLAYER = 0b1000;
 
         string path;
 
@@ -17,9 +21,7 @@ namespace project.cs
         public int height;
         public int boxesCount;
 
-        public BitArray stones;
-        public BitArray boxes;
-        public BitArray targets;
+        public byte[] cells;
         public ushort[] targetXYs;
         public ushort[] boxXYs;
 
@@ -34,13 +36,11 @@ namespace project.cs
             height = map.height;
             boxesCount = map.boxesCount;
 
-            stones = new BitArray(map.stones);
-            boxes = new BitArray(map.boxes);
-            targets = new BitArray(map.targets);
-
+            cells = new byte[size];
             targetXYs = new ushort[map.boxesCount];
             boxXYs = new ushort[map.boxesCount];
 
+            Array.Copy(map.cells, cells, map.size);
             Array.Copy(map.targetXYs, targetXYs, map.boxesCount);
             Array.Copy(map.boxXYs, boxXYs, map.boxesCount);
 
@@ -101,26 +101,24 @@ namespace project.cs
                 throw new Exception("Too big map");
             size = width * height;
 
-            stones = new BitArray(width * height);
-            boxes = new BitArray(width * height);
-            targets = new BitArray(width * height);
+            cells = new byte[size];
             List<ushort> targetXYList = new List<ushort>();
             List<ushort> boxXYList = new List<ushort>();
 
             for (int y = 0; y < height; ++y)
                 for (int x = 0; x < lines[y].Length; ++x)
                 {
-                    int pos = x + y * width;
-                    ushort xy = (ushort)(x | (y << 8));
+                    int pos = XY2Pos(x, y);
+                    ushort xy = Pos2XY(x, y);
                     switch (lines[y][x])
                     {
                         case ' ': break;
-                        case '.': targetXYList.Add(xy); targets.Set(pos, true); break;
-                        case '$': boxXYList.Add(xy); boxes.Set(pos, true);  break;
-                        case '*': targetXYList.Add(xy); targets.Set(pos, true); boxXYList.Add(xy); boxes.Set(pos, true); break;
-                        case '@': playerXY = xy; break;
-                        case '+': targetXYList.Add(xy); targets.Set(pos, true); playerXY = xy; break;
-                        case '#': stones.Set(pos, true); break;
+                        case '.': targetXYList.Add(xy); cells[pos] = O_TARGET; break;
+                        case '$': boxXYList.Add(xy); cells[pos] = O_BOX; break;
+                        case '*': targetXYList.Add(xy); boxXYList.Add(xy); cells[pos] = O_TARGET | O_BOX; break;
+                        case '@': playerXY = xy; cells[pos] = O_PLAYER; break;
+                        case '+': targetXYList.Add(xy); cells[pos] = O_TARGET; playerXY = xy; break;
+                        case '#': cells[pos] = O_STONE; break;
                         default: break;
                     }
                 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace project.cs
 {
@@ -69,7 +68,7 @@ namespace project.cs
                 stepper.Queue(moves, states);
             }
 
-            if(isVictory)
+            if (isVictory)
             {
                 Console.Clear();
                 Console.WriteLine($"Victory found in {countTries} tries");
@@ -78,7 +77,7 @@ namespace project.cs
                 ushort[] state = new ushort[map.boxesCount + 1];
                 Array.Copy(victoryState, state, map.boxesCount + 1);
 
-                while(!arrayComparer.Equals(startState, state))
+                while (!arrayComparer.Equals(startState, state))
                 {
                     solutionBoxStack.Push(state);
                     if (!moves.TryGetValue(state, out state))
@@ -141,7 +140,8 @@ namespace project.cs
                             break;
                     }
                 }
-            } else
+            }
+            else
             {
                 Console.Clear();
                 Console.WriteLine($"Victory not found in {countTries} tries");
@@ -154,8 +154,8 @@ namespace project.cs
         {
             ushort boxFromXY = stateTo[map.boxesCount];
             ushort boxToXY = boxFromXY;
-            for(int i = 0; i < map.boxesCount; ++i)
-                if(Array.BinarySearch(stateFrom, 0, map.boxesCount, stateTo[i]) < 0)
+            for (int i = 0; i < map.boxesCount; ++i)
+                if (Array.BinarySearch(stateFrom, 0, map.boxesCount, stateTo[i]) < 0)
                 {
                     boxToXY = stateTo[i];
                     break;
@@ -174,16 +174,16 @@ namespace project.cs
             if (playerFromXY == playerToXY)
                 return new ushort[] { playerToXY };
 
-            explorer.SetState(stateFrom);
+            explorer.ApplyState(stateFrom);
             explorer.Explore();
 
             return explorer.GetPath(playerToXY);
         }
 
-        void DrawCell(ushort[] state, ushort playerXY, int x, int y)
+        void DrawCell(ushort playerXY, int x, int y)
         {
-            int pos = x + y * map.width;
-            if (map.stones.Get(pos))
+            byte cell = explorer.GetCell(x, y);
+            if ((cell & SokobanSolverMap.O_STONE) != 0)
             {
                 Console.BackgroundColor = ConsoleColor.DarkBlue;
                 Console.ForegroundColor = ConsoleColor.White;
@@ -193,8 +193,8 @@ namespace project.cs
             }
             else
             {
-                ushort xy = (ushort)((y << 8) | x);
-                bool isTarget = map.targets.Get(pos);
+                ushort xy = map.Pos2XY(x, y);
+                bool isTarget = (cell & SokobanSolverMap.O_TARGET) != 0;
 
                 if (isTarget)
                     Console.BackgroundColor = ConsoleColor.DarkYellow;
@@ -205,7 +205,7 @@ namespace project.cs
                     Console.Write("P ");
                     Console.ForegroundColor = ConsoleColor.Gray;
                 }
-                else if (Array.BinarySearch(state, 0, map.boxesCount, xy) >= 0)
+                else if ((cell & SokobanSolverMap.O_BOX) != 0)
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.Write("B ");
@@ -225,11 +225,13 @@ namespace project.cs
 
         public void Render(ushort[] state, ushort playerXY)
         {
+            explorer.ApplyState(state);
+
             Console.SetCursorPosition(0, 2);
             for (int y = 0; y < map.height; ++y)
             {
                 for (int x = 0; x < map.width; ++x)
-                    DrawCell(state,playerXY, x, y);
+                    DrawCell(playerXY, x, y);
                 Console.WriteLine("");
             }
         }

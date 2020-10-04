@@ -1,17 +1,17 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 
 namespace project.cs
 {
     class SokobanSolverExplorer
     {
+        public const byte O_EXPLORED = 0b10000;
+        const byte O_UNEXPLORABLE_MASK = SokobanSolverMap.O_STONE | SokobanSolverMap.O_BOX | O_EXPLORED;
+
         SokobanSolverMap map;
 
         ushort[] state;
 
-        public BitArray boxes;
+        public byte[] cells;
         public int[] distance;
         public ushort[] backtrace;
 
@@ -24,7 +24,9 @@ namespace project.cs
 
             state = null;
 
-            boxes = new BitArray(map.size);
+            cells = new byte[map.size];
+            Array.Copy(map.cells, cells, map.size);
+
             distance = new int[map.size];
             backtrace = new ushort[map.size];
 
@@ -32,30 +34,55 @@ namespace project.cs
             path = new FixedStack<ushort>(map.size);
         }
 
-        public void SetState(ushort[] state)
+        void EraseState()
         {
-            this.state = state;
+            if (state == null)
+                return;
 
-            boxes.SetAll(false);
             for (int i = 0; i < map.boxesCount; ++i)
-                boxes.Set(map.XY2Pos(state[i]), true);
+                cells[map.XY2Pos(state[i])] &= ~SokobanSolverMap.O_BOX & 0xff;
+            cells[map.XY2Pos(state[map.boxesCount])] &= ~SokobanSolverMap.O_PLAYER & 0xff;
+        }
+
+        void EraseExplored()
+        {
+            for (int i = 0; i < map.size; ++i)
+                cells[i] &= ~O_EXPLORED & 0xff;
+        }
+
+        void SetState()
+        {
+            for (int i = 0; i < map.boxesCount; ++i)
+                cells[map.XY2Pos(state[i])] |= SokobanSolverMap.O_BOX;
+            cells[map.XY2Pos(state[map.boxesCount])] |= SokobanSolverMap.O_PLAYER;
+        }
+
+        public void ApplyState(ushort[] state)
+        {
+            EraseState();
+            this.state = state;
+            SetState();
         }
 
         void ExploreNext(int x, int y, ushort prevXY, int newDist)
         {
             if (x < 0 || x >= map.width || y < 0 || y >= map.height)
                 return;
+
             int pos = map.XY2Pos(x, y);
-            if (map.stones.Get(pos) || boxes.Get(pos) || distance[pos] != -1)
+            if ((cells[pos] & O_UNEXPLORABLE_MASK) != 0)
                 return;
-            explore.Enqueue(map.Pos2XY(x,y));
+
+            cells[pos] |= O_EXPLORED;
             distance[pos] = newDist;
             backtrace[pos] = prevXY;
+
+            explore.Enqueue(map.Pos2XY(x, y));
         }
 
         void ExploreStart()
         {
-            Array.Fill(distance, -1);
+            EraseExplored();
 
             ushort xy = state[map.boxesCount];
             int pos = map.XY2Pos(xy);
@@ -69,7 +96,7 @@ namespace project.cs
         public void Explore()
         {
             ExploreStart();
-            while(explore.Count > 0)
+            while (explore.Count > 0)
             {
                 ushort xy = explore.Dequeue();
                 int x, y, pos;
@@ -77,32 +104,17 @@ namespace project.cs
                 int dist = distance[pos] + 1;
 
                 ExploreNext(x - 1, y, xy, dist);
-                ExploreNext(x +1, y, xy, dist);
-                ExploreNext(x , y-1, xy, dist);
-                ExploreNext(x , y+1, xy, dist);
+                ExploreNext(x + 1, y, xy, dist);
+                ExploreNext(x, y - 1, xy, dist);
+                ExploreNext(x, y + 1, xy, dist);
             }
         }
 
-        public void CheckCell(int x, int y, out bool isStone, out bool isOccupied)
+        public byte GetCell(int x, int y)
         {
             if (x < 0 || y < 0 || x >= map.width || y >= map.height)
-            {
-                isStone = true;
-                isOccupied = true;
-                return;
-            }
-
-            int pos = map.XY2Pos(x,y);
-            isStone = map.stones.Get(pos);
-            isOccupied = isStone || boxes.Get(pos);
-        }
-
-        public bool IsOccupied(int x, int y)
-        {
-            if (x < 0 || y < 0 || x >= map.width || y >= map.height)
-                return true;
-            int pos = map.XY2Pos(x, y);
-            return map.stones.Get(pos) || boxes.Get(pos);
+                return SokobanSolverMap.O_STONE;
+            return cells[map.XY2Pos(x, y)];
         }
 
         public int GetDistance(ushort xy)
@@ -116,7 +128,7 @@ namespace project.cs
             ushort xy = toXY;
             path.Clear();
 
-            while(true)
+            while (true)
             {
                 path.Push(xy);
                 if (xy == playerXY)

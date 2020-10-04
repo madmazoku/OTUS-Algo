@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace project.cs
 {
     class SokobanStepper
     {
+        const byte O_OCCUPIED_MASK = SokobanSolverMap.O_STONE | SokobanSolverMap.O_BOX;
+
         SokobanSolverMap map;
         SokobanSolverExplorer explorer;
 
@@ -18,6 +18,7 @@ namespace project.cs
 
         int[] distance;
         int[] order;
+        int newStatesAvaliableCount;
 
         public SokobanStepper(SokobanSolverMap map)
         {
@@ -28,6 +29,7 @@ namespace project.cs
             newStates = new ushort[map.boxesCount * 4][];
             accessXYs = new ushort[map.boxesCount * 4];
 
+            newStatesAvaliableCount = 0;
             distance = new int[map.boxesCount * 4];
             order = new int[map.boxesCount * 4];
 
@@ -50,8 +52,7 @@ namespace project.cs
             Array.Sort(newState, 0, map.boxesCount);
 
             newStates[newStatesCount] = newState;
-            accessXYs[newStatesCount] = map.Pos2XY(accessX,accessY);
-            distance[newStatesCount] = -1;
+            accessXYs[newStatesCount] = map.Pos2XY(accessX, accessY);
 
             ++newStatesCount;
         }
@@ -59,47 +60,43 @@ namespace project.cs
         bool FillStatesNewPerBox(int i)
         {
             ushort xy = state[i];
-            int x, y;
-            map.XY2Pos(xy, out x, out y);
+            int x, y, pos;
+            map.XY2Pos(xy, out x, out y, out pos);
 
-            bool isLeftStone, isLeftOccupied;
-            bool isRightStone,isRightOccupied;
-            bool isUpStone, isUpOccupied;
-            bool isDownStone, isDownOccupied;
+            byte leftCell = explorer.GetCell(x - 1, y);
+            byte rightCell = explorer.GetCell(x + 1, y);
+            byte upCell = explorer.GetCell(x, y - 1);
+            byte downCell = explorer.GetCell(x, y + 1);
 
-            explorer.CheckCell(x - 1, y, out isLeftStone, out isLeftOccupied);
-            explorer.CheckCell(x + 1, y, out isRightStone, out isRightOccupied);
-            explorer.CheckCell(x , y-1, out isUpStone, out isUpOccupied);
-            explorer.CheckCell(x , y+1, out isDownStone, out isDownOccupied);
+            bool IsHorizontalFree = ((leftCell | rightCell) & O_OCCUPIED_MASK) == 0;
+            bool IsVerticalFree = ((upCell | downCell) & O_OCCUPIED_MASK) == 0;
 
-            if(!(isLeftOccupied||isRightOccupied))
+            if (IsHorizontalFree)
             {
                 AddNewState(i, x, y, -1, 0);
                 AddNewState(i, x, y, 1, 0);
             }
 
-            if (!(isUpOccupied || isDownOccupied))
+            if (IsVerticalFree)
             {
                 AddNewState(i, x, y, 0, -1);
                 AddNewState(i, x, y, 0, 1);
             }
 
-            if (!(isLeftOccupied || isRightOccupied) || !(isUpOccupied || isDownOccupied))
+            if (IsHorizontalFree || IsVerticalFree)
                 return true;
 
-            int pos = x + y * map.width;
-            bool isTarget = map.targets.Get(pos);
-            if (isTarget)
+            if ((explorer.cells[pos] & SokobanSolverMap.O_TARGET) != 0)
                 return true;
 
             // immovable box: stones on 2 aligned sides
-            if (isLeftStone && isUpStone || isUpStone && isRightStone || isRightStone && isDownStone || isDownStone && isLeftStone)
+            if ((((leftCell & upCell) | (upCell & rightCell) | (rightCell & downCell) | (downCell & leftCell)) & SokobanSolverMap.O_STONE) != 0)
                 return false;
 
             // immovable box: part of 2x2 occupied square
-            int ox = x + (isLeftOccupied ? -1 : 1);
-            int oy = y + (isUpOccupied ? -1 : 1);
-            if (explorer.IsOccupied(ox, oy))
+            int ox = x + ((leftCell & O_OCCUPIED_MASK) != 0 ? -1 : 1);
+            int oy = y + ((upCell & O_OCCUPIED_MASK) != 0 ? -1 : 1);
+            if ((explorer.GetCell(ox, oy) & O_OCCUPIED_MASK) != 0)
                 return false;
 
             return true;
@@ -108,8 +105,9 @@ namespace project.cs
         bool FillStatesNew()
         {
             newStatesCount = 0;
+            newStatesAvaliableCount = 0;
             for (int i = 0; i < map.boxesCount; ++i)
-                if(!FillStatesNewPerBox(i))
+                if (!FillStatesNewPerBox(i))
                 {
                     newStatesCount = 0;
                     return false;
@@ -125,16 +123,20 @@ namespace project.cs
             for (int i = 0; i < newStatesCount; ++i)
             {
                 map.XY2Pos(accessXYs[i], out x, out y, out pos);
-                distance[i] = explorer.distance[pos];
-                order[i] = i;
+                if ((explorer.cells[pos] & SokobanSolverExplorer.O_EXPLORED) == 0)
+                    continue;
+
+                distance[newStatesAvaliableCount] = explorer.distance[pos];
+                order[newStatesAvaliableCount] = i;
+                ++newStatesAvaliableCount;
             }
-            Array.Sort(distance, order, 0, newStatesCount);
+            Array.Sort(distance, order, 0, newStatesAvaliableCount);
         }
 
         public void Next(ushort[] state)
         {
             this.state = state;
-            explorer.SetState(state);
+            explorer.ApplyState(state);
 
             if (!FillStatesNew())
                 return;
@@ -144,20 +146,15 @@ namespace project.cs
 
         public void Queue(Dictionary<ushort[], ushort[]> moves, Queue<ushort[]> states)
         {
-            for (int i = 0; i < newStatesCount; ++i)
-                if (distance[i] != -1)
+            for (int i = 0; i < newStatesAvaliableCount; ++i)
+            {
+                ushort[] newState = newStates[order[i]];
+                if (!moves.ContainsKey(newState))
                 {
-                    ushort[] newState = newStates[order[i]];
-                    if (!moves.ContainsKey(newState))
-                    {
-                        moves.Add(newState, state);
-                        states.Enqueue(newState);
-                    }
-                    else
-                    {
-                        Console.Write("");
-                    }
+                    moves.Add(newState, state);
+                    states.Enqueue(newState);
                 }
+            }
         }
 
     }
