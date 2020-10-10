@@ -4,8 +4,8 @@ namespace project.cs
 {
     class FixedStack<T>
     {
-        int pos;
-        T[] data;
+        public int pos;
+        public T[] data;
 
         public int Count { get { return pos; } }
 

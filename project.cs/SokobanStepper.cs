@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace project.cs
 {
@@ -155,6 +156,28 @@ namespace project.cs
                     states.Enqueue(newState);
                 }
             }
+        }
+
+        public void QueueThreaded(ConcurrentDictionary<ushort[], ushort[]> moves, ConcurrentQueue<ushort[]> states)
+        {
+            for (int i = 0; i < newStatesAvaliableCount; ++i)
+            {
+                ushort[] newState = newStates[order[i]];
+                if(moves.TryAdd(newState, state))
+                    states.Enqueue(newState);
+            }
+        }
+
+        public void Queue(Queue<ushort[]> states)
+        {
+            for (int i = 0; i < newStatesAvaliableCount; ++i)
+                states.Enqueue(newStates[order[i]]);
+        }
+
+        public void Queue(FixedQueue<ushort[]> states)
+        {
+            for (int i = 0; i < newStatesAvaliableCount; ++i)
+                states.Enqueue(newStates[order[i]]);
         }
 
     }

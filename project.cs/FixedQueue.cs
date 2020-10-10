@@ -4,9 +4,9 @@ namespace project.cs
 {
     class FixedQueue<T>
     {
-        int start;
-        int end;
-        T[] data;
+        public int start;
+        public int end;
+        public T[] data;
 
         public int Count { get { return end - start; } }
 
