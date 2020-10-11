@@ -14,7 +14,7 @@ namespace project.cs
         public const byte O_BOX = 0b0100;
         public const byte O_PLAYER = 0b1000;
 
-        string path;
+        public string path;
 
         public int size;
         public int width;

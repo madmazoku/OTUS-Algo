@@ -158,7 +158,7 @@ namespace project.cs
             }
         }
 
-        public void QueueThreaded(ConcurrentDictionary<ushort[], ushort[]> moves, ConcurrentQueue<ushort[]> states)
+        public void Queue(ConcurrentDictionary<ushort[], ushort[]> moves, ConcurrentQueue<ushort[]> states)
         {
             for (int i = 0; i < newStatesAvaliableCount; ++i)
             {
