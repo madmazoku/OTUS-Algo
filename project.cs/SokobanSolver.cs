@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Collections.Concurrent;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
 using System.IO;
+using System.Text;
 
 namespace project.cs
 {
@@ -18,10 +14,12 @@ namespace project.cs
 
         ArrayComparer<ushort> arrayComparer;
 
-        // child state reference to it's parent
         Dictionary<ushort[], ushort[]> moves;
-        // yet to process states;
         Queue<ushort[]> states;
+
+        ushort[][] solutionBox;
+        ushort[][] solutionPath;
+        int countMoves;
 
         public SokobanSolver(string path)
         {
@@ -32,10 +30,16 @@ namespace project.cs
             states = new Queue<ushort[]>();
 
             explorer = new SokobanSolverExplorer(map);
+
+            solutionBox = null;
+            solutionPath = null;
+            countMoves = 0;
         }
 
         ushort[] SolveStates()
         {
+            map.RenderMap(0, 2);
+
             ushort[] victoryState = new ushort[map.boxesCount + 1];
             Array.Copy(map.targetXYs, victoryState, map.boxesCount);
 
@@ -57,7 +61,7 @@ namespace project.cs
                 if (swCurSec - swPrevSec > 1)
                 {
                     Console.SetCursorPosition(0, 0);
-                    Console.WriteLine($"spent sec: {swCurSec}; states per sec: {Math.Ceiling(countTries / swCurSec)}; states to explore: {states.Count}".PadRight(Console.BufferWidth));
+                    Console.WriteLine($"spent sec: {Math.Round(swCurSec)}; states per sec: {Math.Ceiling(countTries / swCurSec)}; states to explore: {states.Count}".PadRight(Console.BufferWidth));
                     swPrevSec = swCurSec;
                 }
 
@@ -72,23 +76,8 @@ namespace project.cs
             return null;
         }
 
-        public void Run()
+        void BuildSolution(ushort[] victoryState)
         {
-            Stopwatch sw = Stopwatch.StartNew();
-            ushort[] victoryState = SolveStates();
-            sw.Stop();
-
-            if(victoryState == null)
-            {
-                Console.Clear();
-                Console.WriteLine($"Victory not found in {sw.Elapsed.TotalSeconds} sec");
-                Console.ReadKey();
-                return;
-            }
-
-            Console.Clear();
-            Console.WriteLine($"Victory found in {sw.Elapsed.TotalSeconds} sec");
-
             Stack<ushort[]> solutionBoxStack = new Stack<ushort[]>();
             ushort[] state = new ushort[map.boxesCount + 1];
             Array.Copy(victoryState, state, map.boxesCount + 1);
@@ -105,20 +94,26 @@ namespace project.cs
             }
             solutionBoxStack.Push(startState);
 
-            ushort[][] solutionBox = solutionBoxStack.ToArray();
-            ushort[][] solutionPath = new ushort[solutionBox.Length][];
+            solutionBox = solutionBoxStack.ToArray();
+            solutionPath = new ushort[solutionBox.Length][];
+            countMoves = 0;
             for (int i = 0; i < solutionBox.Length - 1; ++i)
-                solutionPath[i] = BuildPath(solutionBox[i], solutionBox[i + 1]);
+            {
+                ushort[] movePlayer = BuildPath(solutionBox[i], solutionBox[i + 1]);
+                solutionPath[i] = movePlayer;
+                countMoves += movePlayer.Length;
+            }
             solutionPath[solutionBox.Length - 1] = new ushort[] { solutionBox[solutionBox.Length - 1][map.boxesCount] };
+        }
 
+        void WriteLRUD()
+        {
             StringBuilder sb = new StringBuilder();
-            int countMoves = -1;
             int playerFromX, playerFromY;
             int playerToX, playerToY;
             map.XY2Pos(solutionPath[0][0], out playerFromX, out playerFromY);
             for (int i = 0; i < solutionPath.Length; ++i)
             {
-                countMoves += solutionPath[i].Length;
                 for (int j = 0; j < solutionPath[i].Length; ++j)
                 {
                     if (i == 0 && j == 0)
@@ -141,9 +136,34 @@ namespace project.cs
 
             string lrudPath = map.path + ".lrud";
             File.WriteAllText(lrudPath, sb.ToString());
+        }
+
+        public void Run()
+        {
+            Console.Clear();
+
+            solutionBox = null;
+            solutionPath = null;
+
+            Stopwatch sw = Stopwatch.StartNew();
+            ushort[] victoryState = SolveStates();
+            sw.Stop();
+
+            if (victoryState == null)
+            {
+                Console.Clear();
+                Console.WriteLine($"Victory not found in {sw.Elapsed.TotalSeconds} sec");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.Clear();
+            Console.WriteLine($"Victory found in {sw.Elapsed.TotalSeconds} sec");
+
+            BuildSolution(victoryState);
+            WriteLRUD();
 
             Console.SetCursorPosition(0, 2 + map.height);
-            Console.WriteLine($"path was stored to {lrudPath}");
             Console.WriteLine("Use left and right arrow keys to explore solution");
             Console.WriteLine("Use Ctrl+left and Ctrl+right arrow keys to animate solution");
 
@@ -152,17 +172,15 @@ namespace project.cs
             int posPlayer = 0;
             int autoMove = 0;
 
-            Console.CursorVisible = false;
-
             while (true)
             {
                 Console.SetCursorPosition(0, 1);
                 Console.Write($"At {posMove} move from {countMoves}".PadRight(Console.BufferWidth));
-                Render(solutionBox[posBox], solutionPath[posBox][posPlayer]);
-                Console.SetCursorPosition(0, 5+map.height);
+                map.RenderMap(solutionBox[posBox], solutionPath[posBox][posPlayer], 0, 2);
+                Console.SetCursorPosition(0, 5 + map.height);
 
                 ConsoleKeyInfo cki;
-                switch(autoMove)
+                switch (autoMove)
                 {
                     case -1:
                         if (posMove == 1)
@@ -221,7 +239,7 @@ namespace project.cs
                 }
             }
 
-            Console.CursorVisible = false;
+            Console.Clear();
         }
 
         ushort[] BuildPath(ushort[] stateFrom, ushort[] stateTo)
@@ -252,62 +270,6 @@ namespace project.cs
             explorer.Explore();
 
             return explorer.GetPath(playerToXY);
-        }
-
-        void DrawCell(ushort playerXY, int x, int y)
-        {
-            byte cell = explorer.GetCell(x, y);
-            if ((cell & SokobanSolverMap.O_STONE) != 0)
-            {
-                Console.BackgroundColor = ConsoleColor.DarkBlue;
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("S ");
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.BackgroundColor = ConsoleColor.Black;
-            }
-            else
-            {
-                ushort xy = map.Pos2XY(x, y);
-                bool isTarget = (cell & SokobanSolverMap.O_TARGET) != 0;
-
-                if (isTarget)
-                    Console.BackgroundColor = ConsoleColor.DarkYellow;
-
-                if (playerXY == xy)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write("P ");
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                }
-                else if ((cell & SokobanSolverMap.O_BOX) != 0)
-                {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write("B ");
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.Write(". ");
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                }
-
-                if (isTarget)
-                    Console.BackgroundColor = ConsoleColor.Black;
-            }
-        }
-
-        public void Render(ushort[] state, ushort playerXY)
-        {
-            explorer.ApplyState(state);
-
-            Console.SetCursorPosition(0, 2);
-            for (int y = 0; y < map.height; ++y)
-            {
-                for (int x = 0; x < map.width; ++x)
-                    DrawCell(playerXY, x, y);
-                Console.WriteLine("");
-            }
         }
 
     }

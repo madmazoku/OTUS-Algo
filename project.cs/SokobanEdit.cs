@@ -335,33 +335,14 @@ namespace project.cs
 
             Console.SetCursorPosition(cursorX << 1, cursorY);
 
-            Console.ResetColor();
             Console.CursorVisible = true;
-        }
-
-        void UpdateWindowSize()
-        {
-            int legentLength = legend.Select(x => x.Length).Max();
-
-            int newWidth = (width << 1) + legentLength + 4;
-            int newHeight = height + 4;
-
-            if (newWidth > Console.BufferWidth)
-                Console.WindowWidth = Console.BufferWidth = newWidth;
-            else
-                Console.BufferWidth = Console.WindowWidth = newWidth;
-
-            if (newHeight > Console.BufferHeight)
-                Console.WindowHeight = Console.BufferHeight = newHeight;
-            else
-                Console.BufferHeight = Console.WindowHeight = newHeight;
+            Console.ResetColor();
         }
 
         public void Run()
         {
-            Console.Title = "Sokoban: Enter Edit mode";
-
-            UpdateWindowSize();
+            Console.Clear();
+            Console.CursorVisible = true;
 
             while (true)
             {
@@ -379,7 +360,7 @@ namespace project.cs
                     switch (cki.Key)
                     {
                         case ConsoleKey.NumPad4:
-                            //case ConsoleKey.LeftArrow:
+                        case ConsoleKey.LeftArrow:
                             if ((cki.Modifiers & ConsoleModifiers.Control) != 0)
                                 Move(-1, 0);
                             else if (cursorX > 0)
@@ -387,7 +368,7 @@ namespace project.cs
                             statusMsg = "Moved left";
                             break;
                         case ConsoleKey.NumPad6:
-                            //case ConsoleKey.RightArrow:
+                        case ConsoleKey.RightArrow:
                             if ((cki.Modifiers & ConsoleModifiers.Control) != 0)
                                 Move(1, 0);
                             else if (cursorX < width - 1)
@@ -395,7 +376,7 @@ namespace project.cs
                             statusMsg = "Moved right";
                             break;
                         case ConsoleKey.NumPad8:
-                            //case ConsoleKey.UpArrow:
+                        case ConsoleKey.UpArrow:
                             if ((cki.Modifiers & ConsoleModifiers.Control) != 0)
                                 Move(0, -1);
                             else if (cursorY > 0)
@@ -403,7 +384,7 @@ namespace project.cs
                             statusMsg = "Moved up";
                             break;
                         case ConsoleKey.NumPad2:
-                            //case ConsoleKey.DownArrow:
+                        case ConsoleKey.DownArrow:
                             if ((cki.Modifiers & ConsoleModifiers.Control) != 0)
                                 Move(0, 1);
                             else if (cursorY < height - 1)
@@ -413,12 +394,10 @@ namespace project.cs
                         case ConsoleKey.Add:
                             Resize(1, 1);
                             statusMsg = "Map enlarged";
-                            UpdateWindowSize();
                             break;
                         case ConsoleKey.Subtract:
                             Resize(-1, -1);
                             statusMsg = "Map shrinked";
-                            UpdateWindowSize();
                             break;
                         case ConsoleKey.S:
                             SetStone(cursorX, cursorY);
@@ -457,10 +436,8 @@ namespace project.cs
                 }
             }
 
+            Console.CursorVisible = false;
             Console.Clear();
-
-            Console.Title = "Sokoban: Leave Edit mode";
-
         }
 
     }

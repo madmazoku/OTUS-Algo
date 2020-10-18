@@ -6,21 +6,6 @@ namespace project.cs
     class Program
     {
 
-        static string GetLessonsDataPath(int lesson)
-        {
-            string lessonDir = $"//lesson.{lesson:d2}.data";
-            DirectoryInfo path = new DirectoryInfo(Directory.GetCurrentDirectory());
-            while (path != null)
-            {
-                if (Directory.Exists(path.ToString() + lessonDir))
-                {
-                    return path.ToString() + lessonDir;
-                }
-                path = path.Parent;
-            }
-            throw new Exception($"{lessonDir} directory not found through the parents of current directory");
-        }
-
         static string FindLevelDirectory(string path = "")
         {
             if (path.Length == 0)
@@ -37,18 +22,30 @@ namespace project.cs
             throw new Exception($"\"Levels\" directory not found from {path} and up");
         }
 
+        static void UpdateWindowSize(int width, int height)
+        {
+            if (width > Console.BufferWidth)
+                Console.WindowWidth = Console.BufferWidth = width;
+            else
+                Console.BufferWidth = Console.WindowWidth = width;
+
+            if (height > Console.BufferHeight)
+                Console.WindowHeight = Console.BufferHeight = height;
+            else
+                Console.BufferHeight = Console.WindowHeight = height;
+        }
+
         static void Main(string[] args)
         {
+            UpdateWindowSize(160, 40);
+            Console.CursorVisible = false;
+
             string levelDirectory = FindLevelDirectory();
 
-            //SokobanEdit se = new SokobanEdit(32, 32, Path.Combine(levelDirectory, "0004.txt"));
-            //se.Run();
+            SokobanMenu sm = new SokobanMenu(levelDirectory);
+            sm.Run();
 
-            //SokobanPlay sp = new SokobanPlay(Path.Combine(levelDirectory, "0004.txt"));
-            //sp.Run();
-
-            SokobanSolver ss = new SokobanSolver(Path.Combine(levelDirectory, "0004.txt"));
-            ss.Run();
+            Console.CursorVisible = true;
         }
     }
 }

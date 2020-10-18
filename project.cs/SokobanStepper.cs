@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace project.cs
 {
@@ -163,7 +163,7 @@ namespace project.cs
             for (int i = 0; i < newStatesAvaliableCount; ++i)
             {
                 ushort[] newState = newStates[order[i]];
-                if(moves.TryAdd(newState, state))
+                if (moves.TryAdd(newState, state))
                     states.Enqueue(newState);
             }
         }

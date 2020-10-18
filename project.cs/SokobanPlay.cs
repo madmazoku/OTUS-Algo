@@ -2,6 +2,8 @@
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace project.cs
 {
@@ -18,6 +20,10 @@ namespace project.cs
         BitArray target;
         int playerX;
         int playerY;
+
+        string solveLRUD;
+        int solvePos;
+        bool animate;
 
         public SokobanPlay(string path)
         {
@@ -68,6 +74,13 @@ namespace project.cs
                         default: break;
                     }
                 }
+
+            solveLRUD = null;
+            solvePos = 0;
+            animate = false;
+
+            if (File.Exists(path + ".lrud"))
+                solveLRUD = File.ReadAllText(path + ".lrud");
         }
 
         void DrawCell(int x, int y, bool locate)
@@ -125,6 +138,10 @@ namespace project.cs
                     DrawCell(x, y, false);
                 Console.WriteLine("");
             }
+            Console.SetCursorPosition(0, height + 1);
+            Console.WriteLine("Use arrow keys to move player");
+            Console.WriteLine("Use 'R' key to restart level");
+            Console.WriteLine("Enter key to Restart level + animate solution if exists");
         }
 
         bool IsEqual(BitArray a, BitArray b)
@@ -187,34 +204,46 @@ namespace project.cs
             DrawCell(playerXNew, playerYNew, true);
         }
 
-        void UpdateWindowSize()
-        {
-            int newWidth = (width << 1) + 1;
-            int newHeight = height + 1;
-
-            if (newWidth > Console.BufferWidth)
-                Console.WindowWidth = Console.BufferWidth = newWidth;
-            else
-                Console.BufferWidth = Console.WindowWidth = newWidth;
-
-            if (newHeight > Console.BufferHeight)
-                Console.WindowHeight = Console.BufferHeight = newHeight;
-            else
-                Console.BufferHeight = Console.WindowHeight = newHeight;
-        }
 
         public void Run()
         {
-            Console.Title = "Sokoban: Enter Play mode";
-            Console.CursorVisible = false;
-
-            UpdateWindowSize();
+            Console.Clear();
 
             Render();
 
             while (true)
             {
-                ConsoleKeyInfo cki = Console.ReadKey(true);
+                ConsoleKeyInfo cki;
+
+                if (animate)
+                {
+                    Thread.Sleep(100);
+                    if (solvePos < solveLRUD.Length)
+                    {
+                        switch (solveLRUD[solvePos++])
+                        {
+                            case 'L':
+                                cki = new ConsoleKeyInfo('\0', ConsoleKey.LeftArrow, false, false, false);
+                                break;
+                            case 'R':
+                                cki = new ConsoleKeyInfo('\0', ConsoleKey.RightArrow, false, false, false);
+                                break;
+                            case 'U':
+                                cki = new ConsoleKeyInfo('\0', ConsoleKey.UpArrow, false, false, false);
+                                break;
+                            case 'D':
+                                cki = new ConsoleKeyInfo('\0', ConsoleKey.DownArrow, false, false, false);
+                                break;
+                            default:
+                                throw new Exception("Unknown key in LRUD solve sequence");
+                        }
+                    }
+                    else
+                        cki = new ConsoleKeyInfo('\0', ConsoleKey.Spacebar, false, false, false);
+                }
+                else
+                    cki = Console.ReadKey(true);
+
                 if (cki.Key == ConsoleKey.Escape)
                     break;
 
@@ -236,15 +265,32 @@ namespace project.cs
                             break;
                         case ConsoleKey.R:
                             ReadMap();
+                            Render();
+                            break;
+                        case ConsoleKey.Enter:
+                            if (!animate)
+                            {
+                                ReadMap();
+                                Render();
+                                if (solveLRUD != null)
+                                {
+                                    animate = true;
+                                    Task.Run(() => { Console.ReadKey(true); animate = false; });
+                                }
+                            }
                             break;
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    animate = false;
                     Console.Beep();
+                    Console.SetCursorPosition(0, height + 5);
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Error: {e.Message}");
                 }
 
-                if (IsEqual(box, target))
+                if (!animate && IsEqual(box, target))
                 {
                     DrawVictory();
                     Console.ReadKey(true);
@@ -252,9 +298,7 @@ namespace project.cs
                 }
             }
 
-            Console.ResetColor();
-            Console.CursorVisible = true;
-            Console.Title = "Sokoban: Leave Play mode";
+            Console.Clear();
         }
     }
 }
