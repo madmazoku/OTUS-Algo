@@ -89,6 +89,7 @@ namespace project.cs
 
             explore.Clear();
             explore.Enqueue(xy);
+            cells[pos] |= O_EXPLORED;
             distance[pos] = 0;
             backtrace[pos] = xy;
         }

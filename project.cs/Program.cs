@@ -37,7 +37,7 @@ namespace project.cs
 
         static void Main(string[] args)
         {
-            UpdateWindowSize(160, 40);
+            UpdateWindowSize(90, 20);
             Console.CursorVisible = false;
 
             string levelDirectory = FindLevelDirectory();
